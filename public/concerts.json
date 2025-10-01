@@ -1,0 +1,6 @@
+[
+  { "id": 1, "artist": "Coldplay", "name": "Coldplay Live", "city": "London, UK", "country":"UK", "continent":"Europe", "lat": 51.5074, "lng": -0.1278, "date": "2025-10-15", "isLive": false, "tickets":"#" },
+  { "id": 2, "artist": "BTS", "name": "BTS World Tour", "city": "Seoul", "country":"South Korea", "continent":"Asia", "lat": 37.5665, "lng": 126.978, "date":"2025-11-05", "isLive": true, "tickets":"#" },
+  { "id": 3, "artist": "Coachella", "name": "Coachella 2026", "city": "Indio, CA, USA", "country":"USA", "continent":"North America", "lat": 33.7206, "lng": -116.2156, "date":"2026-04-10", "isLive": false, "tickets":"#" },
+   { "id": 4, "artist": "Arijit", "name": "India 2026", "city": "Margao, Goa, India", "country":"India", "continent":"Asia", "lat": 15.2859, "lng": 73.9787, "date":"2026-09-10", "isLive": true, "tickets":"#" }  
+]

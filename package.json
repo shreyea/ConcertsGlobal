@@ -1,0 +1,29 @@
+{
+  "name": "concerts-globe-frontend",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@supabase/supabase-js": "^2.58.0",
+    "axios": "^1.12.2",
+    "motion": "^12.23.22",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^5.5.0",
+    "react-router-dom": "^6.30.1",
+    "react-tsparticles": "^2.12.2",
+    "three": "^0.160.1",
+    "tsparticles": "^2.12.0",
+    "tsparticles-engine": "^2.12.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.1.0",
+    "vite": "^7.1.7"
+  }
+}
