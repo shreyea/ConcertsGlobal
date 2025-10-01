@@ -24,9 +24,10 @@ function Marker({ pos, onClick }) {
   );
 }
 
-export default function Globe({ events = [], onMarkerClick = ()=>{}, onGlobeMouseDown = ()=>{}, onGlobeMouseUp = ()=>{} }) {
+export default function Globe({ events = [], onMarkerClick = ()=>{}, onGlobeMouseDown = ()=>{}, onGlobeMouseUp = ()=>{}, isActive = false }) {
   const [texture, setTexture] = useState(null);
   const mountedRef = useRef(true);
+  const controlsRef = useRef();
 
   useEffect(() => {
     mountedRef.current = true;
@@ -40,22 +41,31 @@ export default function Globe({ events = [], onMarkerClick = ()=>{}, onGlobeMous
     return () => { mountedRef.current = false; };
   }, []);
 
+  // Handle wheel events to control zoom behavior
+  useEffect(() => {
+    const handleWheel = (e) => {
+      // Only allow zoom with Ctrl/Cmd key
+      if (!e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    const globeContainer = document.querySelector('.globe-area-60');
+    if (globeContainer) {
+      globeContainer.addEventListener('wheel', handleWheel, { passive: false });
+      return () => {
+        globeContainer.removeEventListener('wheel', handleWheel);
+      };
+    }
+  }, []);
+
   return (
-    <div className="globe-area-60">
-      <Canvas
-        style={{ width: '100%', height: '100%' }}
-        camera={{ position: [0, 0, 6], fov: 45 }}
-        gl={{ antialias: true }}
-        onCreated={({ gl, scene }) => {
-          // Set a darker blue gradient background for the 3D scene
-          const canvas = gl.domElement;
-          canvas.style.background = 'linear-gradient(135deg, #23344a 0%, #1a2333 100%)';
-          scene.background = null;
-        }}
-      >
-        <ambientLight intensity={0.7}/>
-        <directionalLight position={[5,5,5]} intensity={0.8}/>
-        <Stars radius={100} depth={50} count={1200} factor={4.5} fade color="#3a5a7a" />
+    <div className={`globe-area-60 ${isActive ? 'globe-fullscreen' : ''}`}>
+      <Canvas style={{ width: '100%', height: '100%' }} camera={{ position: [0, 0, 6], fov: 45 }}>
+        <ambientLight intensity={0.6}/>
+        <directionalLight position={[5,5,5]} intensity={0.7}/>
+        <Stars radius={100} depth={50} count={1000} factor={4} fade />
         <mesh
           rotation={[0, 0, 0]}
           onPointerDown={() => {
@@ -67,7 +77,7 @@ export default function Globe({ events = [], onMarkerClick = ()=>{}, onGlobeMous
           }}
         >
           <sphereGeometry args={[2, 64, 64]} />
-          <meshStandardMaterial map={texture ?? null} color={texture ? undefined : "#3a5a7a"} />
+          <meshStandardMaterial map={texture ?? null} color={texture ? undefined : "#0b2f4a"} />
         </mesh>
 
         {Array.isArray(events) && events.map(ev => {
@@ -79,7 +89,15 @@ export default function Globe({ events = [], onMarkerClick = ()=>{}, onGlobeMous
           return <Marker key={ev.id} pos={pos} onClick={() => onMarkerClick(ev)} />;
         })}
 
-        <OrbitControls enablePan={false} rotateSpeed={0.4} />
+        <OrbitControls 
+          ref={controlsRef}
+          enablePan={false} 
+          rotateSpeed={0.4}
+          enableZoom={true}
+          zoomSpeed={0.5}
+          minDistance={4}
+          maxDistance={10}
+        />
       </Canvas>
     </div>
   );

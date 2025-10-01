@@ -1,13 +1,15 @@
 import React, { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-
+import { likeConcert } from '../api/concertsApi';
 
 export default function EventCard({ event, onOpen }) {
+  const token = localStorage.getItem('token');
+  const [isTracked, setIsTracked] = React.useState(event.liked || false);
 
-  // Like functionality disabled (backend required)
-  const [isLiked] = React.useState(event.liked || false);
-  function handleLike() {
-    alert('Login and backend required to like events.');
+  async function handleTrack() {
+    if (!token) return alert('Login required to track events');
+    const res = await likeConcert(event._id || event.id, token);
+    if (res.success) setIsTracked(true);
   }
 
   return (
@@ -18,8 +20,8 @@ export default function EventCard({ event, onOpen }) {
       </div>
       <div className="event-actions">
         <button className="btn" onClick={() => onOpen(event)}>Details</button>
-        <button className={`btn btn-${isLiked ? 'liked' : 'like'}`} onClick={handleLike}>
-          {isLiked ? "Liked" : "Like"}
+        <button className={`btn btn-${isTracked ? 'tracked' : 'track'}`} onClick={handleTrack}>
+          {isTracked ? "Tracking" : "Track"}
         </button>
       </div>
     </article>

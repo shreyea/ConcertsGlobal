@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import image from '../assets/logo.png';
+import '../styles/navigation.css';
 
 export default function Navbar() {
   return (
@@ -16,12 +17,11 @@ export default function Navbar() {
         </Link>
         <nav className="nav-links">
           <Link to="/">Home</Link>
-          <Link to="/live">Live Events</Link>
+          <Link to="/tracked">Track</Link>
           <Link to="/around-me">Around Me</Link>
-          <Link to="/liked">Liked</Link>
+          <Link to="/login">Login</Link>
         </nav>
       </div>
     </header>
   );
-      
 }

@@ -5,7 +5,7 @@ import { AppContext } from "../context/AppContext";
 export default function Popup({ concert, onClose }) {
   const { liked, toggleLike } = useContext(AppContext);
   if (!concert) return null;
-  const isLiked = liked.some(e => e.id === concert.id);
+  const isTracked = liked.some(e => e.id === concert.id);
 
   return (
     <div className="popup-backdrop" onClick={onClose}>
@@ -15,8 +15,8 @@ export default function Popup({ concert, onClose }) {
         <p>{concert.date}</p>
         <div className="popup-actions">
           <a className="btn btn-primary" href={concert.tickets || "#"} target="_blank" rel="noreferrer">Tickets</a>
-          <button className={`btn ${isLiked ? 'btn-liked' : 'btn-like'}`} onClick={() => toggleLike(concert)}>
-            {isLiked ? "Liked" : "Like"}
+          <button className={`btn ${isTracked ? 'btn-tracked' : 'btn-track'}`} onClick={() => toggleLike(concert)}>
+            {isTracked ? "Tracking" : "Track"}
           </button>
         </div>
         <button className="popup-close" onClick={onClose}>Close</button>

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-// import EventCard from "../components/EventCard";
+import EventCard from "../components/EventCard";
 import BackgroundParticles from "../components/BackgroundParticles";
-import { getConcerts } from "../api/concertsApi";
 
 export default function LiveEvents() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getConcerts()
+    fetch("/concerts.json")
+      .then((r) => r.json())
       .then((data) => {
-        setEvents((data || []).filter((ev) => ev.isLive !== false));
+        setEvents((data || []).filter((ev) => ev.isLive));
       })
       .finally(() => setLoading(false));
   }, []);
@@ -42,17 +42,10 @@ export default function LiveEvents() {
                 key={ev.id}
                 className="event-card"
                 style={{
-                  animationDelay: `${idx * 180}ms`,
+                  animationDelay: `${idx * 180}ms`, // staggered delay (120ms apart)
                 }}
               >
-                <h3>{ev.artist}</h3>
-                <div><b>Venue:</b> {ev.venue}</div>
-                <div><b>City:</b> {ev.city}, <b>Country:</b> {ev.country}</div>
-                <div><b>Date:</b> {ev.date}</div>
-                <div><b>Genre:</b> {ev.genre}</div>
-                <div>
-                  <a href={ev.ticket_url} target="_blank" rel="noopener noreferrer" className="btn">Tickets</a>
-                </div>
+                <EventCard event={ev} />
               </div>
             ))}
           </div>

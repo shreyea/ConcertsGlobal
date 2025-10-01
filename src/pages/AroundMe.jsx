@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-
 import BackgroundParticles from "../components/BackgroundParticles";
-import { getConcerts } from "../api/concertsApi";
 
 
 function distanceKm(lat1, lon1, lat2, lon2){
@@ -21,8 +19,20 @@ export default function AroundMe(){
   useEffect(()=> {
     navigator.geolocation.getCurrentPosition((p)=> setPos({lat:p.coords.latitude, lng:p.coords.longitude}), ()=> setPos(null));
     getConcerts().then(data => {
-  // Use the API data as-is for now
-  setAll(data);
+      data = (data || []).map(c => ({
+        id: c._id || c.apiId,
+        artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
+        name: c.name,
+        city: c.location || '',
+        country: '',
+        continent: '',
+        lat: c.lat,
+        lng: c.lng,
+        date: c.date ? new Date(c.date).toLocaleDateString() : '',
+        isLive: true,
+        tickets: '#',
+      }));
+      setAll(data);
     });
   }, []);
 
@@ -56,16 +66,7 @@ export default function AroundMe(){
         {!pos ? <p className="muted">Location unavailable or blocked.</p> : <p className="muted">Your location: {pos.lat.toFixed(3)}, {pos.lng.toFixed(3)}</p>}
         <div className="cards-grid">
           {nearby.length ? nearby.slice(0, visibleCount).map(ev => (
-            <div className="event-card" key={ev.id}>
-              <h3>{ev.artist}</h3>
-              <div><b>Venue:</b> {ev.venue}</div>
-              <div><b>City:</b> {ev.city}, <b>Country:</b> {ev.country}</div>
-              <div><b>Date:</b> {ev.date}</div>
-              <div><b>Genre:</b> {ev.genre}</div>
-              <div>
-                <a href={ev.ticket_url} target="_blank" rel="noopener noreferrer" className="btn">Tickets</a>
-              </div>
-            </div>
+            <div className="event-card" key={ev.id}><h3>{ev.name}</h3><p>{ev.city}</p></div>
           )) : <p className="muted">No nearby events found.</p>}
         </div>
       </div>

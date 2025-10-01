@@ -22,7 +22,7 @@ export default function BackgroundParticles({ id = "tsparticles-bg" }) {
         pointerEvents: "none", // prevent accidental interaction glitches
       }}
       options={{
-        background: { color: { value: "#10151c" } }, // soft, minimal dark
+        background: { color: { value: "#8ea3bfff" } }, // soft, minimal dark
         fpsLimit: 60,
         interactivity: {
           events: {
@@ -33,7 +33,7 @@ export default function BackgroundParticles({ id = "tsparticles-bg" }) {
         },
         particles: {
           number: { value: 60, density: { enable: true, area: 900 } }, // fewer particles
-          color: { value: "#b0b8c1" }, // soft gray
+          color: { value: "#62a4eeff" }, // soft gray
           links: {
             enable: false,
           },

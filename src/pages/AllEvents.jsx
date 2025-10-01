@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-// import EventCard from "../components/EventCard";
+import EventCard from "../components/EventCard";
 import BackgroundParticles from "../components/BackgroundParticles";
-import { getConcerts } from "../api/concertsApi";
+
 
 function distanceKm(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -17,17 +17,45 @@ export default function AllEvents() {
   const [visibleCount, setVisibleCount] = useState(0);
 
   useEffect(() => {
+    // Fetch concerts from backend API
+    let lat, lng;
     navigator.geolocation.getCurrentPosition(
       (p) => {
-        const lat = p.coords.latitude;
-        const lng = p.coords.longitude;
-        getConcerts().then(data => {
+        lat = p.coords.latitude;
+        lng = p.coords.longitude;
+        getConcerts(lat, lng).then(data => {
+          data = (data || []).map(c => ({
+            id: c._id || c.apiId,
+            artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
+            name: c.name,
+            city: c.location || '',
+            country: '',
+            continent: '',
+            lat: c.lat,
+            lng: c.lng,
+            date: c.date ? new Date(c.date).toLocaleDateString() : '',
+            isLive: true,
+            tickets: '#',
+          }));
           setEvents(data);
           setPos({ lat, lng });
         });
       },
       () => {
         getConcerts().then(data => {
+          data = (data || []).map(c => ({
+            id: c._id || c.apiId,
+            artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
+            name: c.name,
+            city: c.location || '',
+            country: '',
+            continent: '',
+            lat: c.lat,
+            lng: c.lng,
+            date: c.date ? new Date(c.date).toLocaleDateString() : '',
+            isLive: true,
+            tickets: '#',
+          }));
           setEvents(data);
         });
       }
@@ -63,15 +91,10 @@ export default function AllEvents() {
                 <div
                   className="event-card"
                   key={ev.id}
+                  
                 >
-                  <h3>{ev.artist}</h3>
-                  <div><b>Venue:</b> {ev.venue}</div>
-                  <div><b>City:</b> {ev.city}, <b>Country:</b> {ev.country}</div>
-                  <div><b>Date:</b> {ev.date}</div>
-                  <div><b>Genre:</b> {ev.genre}</div>
-                  <div>
-                    <a href={ev.ticket_url} target="_blank" rel="noopener noreferrer" className="btn">Tickets</a>
-                  </div>
+                  <h3>{ev.name}</h3>
+                  <p>{ev.city}</p>
                   {pos && typeof ev.lat === 'number' && typeof ev.lng === 'number' && (
                     <p style={{ color: '#9aa6b2', fontSize: '0.95rem' }}>
                       {distanceKm(pos.lat, pos.lng, ev.lat, ev.lng).toFixed(1)} km away

@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
-import { getConcerts } from "../api/concertsApi";
-
+import { getConcerts } from "../api/concertsApi"; // Note: exported name getConcerts in your version
 import Globe from "../components/Globe";
 import Stats from "../components/Stats";
 import Filters from "../components/Filters";
@@ -32,7 +31,21 @@ export default function Home(){
           lng = pos.coords.longitude;
         } catch {}
       }
-      let data = await getConcerts();
+      let data = await getConcerts(lat, lng);
+      // Map backend concert data to frontend format
+      data = (data || []).map(c => ({
+        id: c._id || c.apiId,
+        artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
+        name: c.name,
+        city: c.location || '',
+        country: '', // Ticketmaster API does not provide country directly
+        continent: '', // Optionally map based on location/country
+        lat: c.lat,
+        lng: c.lng,
+        date: c.date ? new Date(c.date).toLocaleDateString() : '',
+        isLive: true, // Assume all are live for now
+        tickets: '#', // Optionally add ticket URL
+      }));
       setEvents(data);
     })();
 
@@ -42,7 +55,21 @@ export default function Home(){
       try {
         let data = JSON.parse(msg.data);
         if (data.type === "concerts-update" && Array.isArray(data.concerts)) {
-          setEvents(data.concerts);
+          // Map backend concert data to frontend format
+          data = data.concerts.map(c => ({
+            id: c._id || c.apiId,
+            artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
+            name: c.name,
+            city: c.location || '',
+            country: '',
+            continent: '',
+            lat: c.lat,
+            lng: c.lng,
+            date: c.date ? new Date(c.date).toLocaleDateString() : '',
+            isLive: true,
+            tickets: '#',
+          }));
+          setEvents(data);
         }
       } catch {}
     };
@@ -67,7 +94,8 @@ export default function Home(){
         </Canvas>
       </div>
       <main className="main-container" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
-        <section className="top-section">
+
+        <section className={`top-section ${globeActive ? 'fade-out' : ''}`}>
           <Stats events={filtered} liked={liked} />
           <Filters events={events} continent={continent} setContinent={setContinent} artist={artist} setArtist={setArtist} />
         </section>
@@ -80,27 +108,12 @@ export default function Home(){
               }}
               onGlobeMouseDown={() => setGlobeActive(true)}
               onGlobeMouseUp={() => setGlobeActive(false)}
+              isActive={globeActive}
             />
         </section>
 
-        <section className="cards-section" style={{marginTop: 32}}>
-          <h2 style={{marginBottom: 16}}>All Events</h2>
-          {events.length === 0 ? (
-            <p className="muted">No events found.</p>
-          ) : (
-            events.map(ev => (
-              <div className="event-card" key={ev.id}>
-                <h3 style={{fontWeight: 700, fontSize: '1.2rem', color: '#1a5cff'}}>{ev.artist}</h3>
-                <div style={{fontWeight: 600, fontSize: '1.05rem'}}><b>Venue:</b> {ev.venue}</div>
-                <div style={{fontWeight: 600, fontSize: '1.05rem'}}><b>Date:</b> {ev.date}</div>
-                <div style={{color: '#6a7a8c', fontSize: '0.98rem'}}><b>City:</b> {ev.city}, <b>Country:</b> {ev.country}</div>
-                <div style={{color: '#6a7a8c', fontSize: '0.98rem'}}><b>Genre:</b> {ev.genre}</div>
-                <div style={{marginTop: 8}}>
-                  <a href={ev.ticket_url} target="_blank" rel="noopener noreferrer" className="btn">Tickets</a>
-                </div>
-              </div>
-            ))
-          )}
+        <section className={`cards-section${globeActive ? " fade-out" : ""}`}>
+          {filtered.map(ev => <EventCard key={ev.id} event={ev} onOpen={(e)=>setSelected(e)} />)}
         </section>
 
         {selected && <Popup concert={selected} onClose={() => {
