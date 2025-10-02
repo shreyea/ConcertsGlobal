@@ -50,12 +50,28 @@
    - Added `fade-out` class to cards-section when globe is active
    - Passed `isActive` prop to Globe component
    - Fixed duplicate top-section rendering
+   - Introduced Globe ↔ Map switcher with shared fullscreen logic and smooth crossfade
+   - Keeps a single `surfaceActive` state that both views interact with
+    - Clicking either surface expands it fullscreen; exiting the surface area collapses it back
 
 3. **`src/styles/global.css`**
    - Added `.fade-out` class with opacity and pointer-events control
    - Updated `.globe-area-60.globe-fullscreen` for fullscreen mode
    - Added transitions to `.top-section` and `.cards-section`
    - Improved `.cards-section` with flex-wrap and proper spacing
+   - Styled toggle controls, stacked view layers, and custom Leaflet markers/popups for the map view
+
+4. **`src/components/MapView.jsx`** *(new)*
+   - Uses `react-leaflet` with a dark basemap and custom div-icon markers to mirror the globe pins
+   - Shares events data/handlers with the globe and mirrors fullscreen mouse interactions
+
+### View Switching & Map Experience
+
+- 🌍 **Globe View** remains the default; 🌐 markers keep aligning via `latLngToXYZ`.
+- 🗺️ **Map View** renders a Leaflet 2D projection so markers sit directly on their latitude/longitude.
+- **Toggle** buttons sit above the surface container, crossfading between globe and map while keeping layout height stable.
+- **Fullscreen interactions** are shared: clicking either surface fades other UI and expands the container; press **`H`** (or switch tabs) to revert to the standard layout.
+- The map auto-fits to active events and refreshes layout on visibility changes to avoid the common Leaflet sizing bug after hidden transitions.
 
 4. **`scripts/generateEarthTexture.js`**
    - Node script that draws an equirectangular Earth texture with a 15° graticule using `canvas`, `d3-geo`, and `world-atlas`

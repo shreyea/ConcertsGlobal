@@ -5,29 +5,42 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
  * Get all concerts from the API or fallback to local JSON
  */
 export async function getConcerts() {
+  // First try local JSON as it's faster and more reliable in development
   try {
-    // Try to fetch from backend API first
-    const response = await fetch(`${API_BASE_URL}/concerts`);
+    const response = await fetch('/concerts.json');
     if (response.ok) {
       const data = await response.json();
       return data;
     }
   } catch (error) {
-    console.warn('API not available, loading from local JSON:', error.message);
+    console.warn('Could not load local concerts.json:', error.message);
   }
-  
-  // Fallback to local JSON file
+
+  // Then try the API
   try {
-    const response = await fetch('/concerts.json');
-    if (!response.ok) {
-      throw new Error('Failed to load concerts.json');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    
+    const response = await fetch(`${API_BASE_URL}/concerts`, {
+      signal: controller.signal
+    });
+    
+    clearTimeout(timeoutId);
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data;
     }
-    const data = await response.json();
-    return data;
   } catch (error) {
-    console.error('Error loading concerts:', error);
-    return [];
+    if (error.name === 'AbortError') {
+      console.warn('API request timed out, using empty dataset');
+    } else {
+      console.warn('API not available:', error.message);
+    }
   }
+
+  // Return empty array if both methods fail
+  return [];
 }
 
 /**

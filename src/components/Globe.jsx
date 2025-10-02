@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stars } from "@react-three/drei";
+import { OrbitControls, Stars, Html } from "@react-three/drei";
 import * as THREE from "three";
 
 /* lat/lng -> xyz on sphere r */
@@ -14,13 +14,33 @@ function latLngToXYZ(lat, lng, r = 2.5) {
   return [x, y, z];
 }
 
-function Marker({ pos, onClick }) {
+function Marker({ pos, onClick, event }) {
+  const [hovered, setHovered] = useState(false);
   return (
     <group position={pos}>
-      <mesh onPointerDown={(e)=>{ e.stopPropagation(); onClick(); }}>
+      <mesh 
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          onClick(event);
+        }}
+      >
         <sphereGeometry args={[0.06, 12, 12]} />
-        <meshStandardMaterial color="#ffb347" emissive="#ff7a00" emissiveIntensity={0.9} />
+        <meshStandardMaterial 
+          color={hovered ? "#ffd700" : "#ffb347"} 
+          emissive={hovered ? "#ff9900" : "#ff7a00"} 
+          emissiveIntensity={hovered ? 1.2 : 0.9} 
+        />
       </mesh>
+      {hovered && (
+        <Html position={[0, 0.15, 0]} center distanceFactor={8}>
+          <div className="marker-tooltip">
+            <div>{event.name}</div>
+            <div className="muted">{event.artist}</div>
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
@@ -28,9 +48,10 @@ function Marker({ pos, onClick }) {
 export default function Globe({ 
   events = [], 
   onMarkerClick = ()=>{}, 
-  onGlobeMouseDown = ()=>{}, 
-  onGlobeMouseUp = ()=>{}, 
-  isActive = false 
+  onGlobeActivate = ()=>{}, 
+  onGlobeDeactivate = ()=>{}, 
+  isActive = false,
+  containerClassName = ""
 }) {
   const [texture, setTexture] = useState(null);
   const mountedRef = useRef(true);
@@ -73,8 +94,22 @@ export default function Globe({
     }
   }, []);
 
+  const handleActivate = () => {
+    onGlobeActivate();
+  };
+  useEffect(() => {
+  if (!isActive) {
+    onGlobeDeactivate();
+  }
+}, [isActive, onGlobeDeactivate]);
+
+
   return (
-    <div className={`globe-area-60 ${isActive ? 'globe-fullscreen' : ''}`}>
+    <div
+      className={`globe-area-60 ${isActive ? 'globe-fullscreen' : ''} ${containerClassName}`.trim()}
+      onClick={handleActivate}
+      role="presentation"
+    >
       <Canvas style={{ width: '100%', height: '100%' }} camera={{ position: [0, 0, 6], fov: 45 }}>
         <ambientLight intensity={0.6}/>
         <directionalLight position={[5,5,5]} intensity={0.7}/>
@@ -82,12 +117,9 @@ export default function Globe({
 
         <group rotation={[0, -Math.PI / 2, 0]}>
           <mesh
-            onPointerDown={() => {
-              onGlobeMouseDown();
+            onClick={() => {
+              handleActivate();
               onMarkerClick(null);
-            }}
-            onPointerUp={() => {
-              onGlobeMouseUp();
             }}
           >
             <sphereGeometry args={[2, 64, 64]} />
@@ -102,7 +134,17 @@ export default function Globe({
             const lng = typeof ev.lng === "number" ? ev.lng : (ev.location?.lng ?? null);
             if (typeof lat !== "number" || typeof lng !== "number") return null;
             const pos = latLngToXYZ(lat, lng, 2);
-            return <Marker key={ev.id} pos={pos} onClick={() => onMarkerClick(ev)} />;
+            return (
+              <Marker
+                key={ev.id}
+                pos={pos}
+                event={ev}
+                onClick={() => {
+                  handleActivate();
+                  onMarkerClick(ev);
+                }}
+              />
+            );
           })}
         </group>
 

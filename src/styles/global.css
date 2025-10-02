@@ -21,6 +21,11 @@
   position: relative;
   background: rgba(24, 30, 37, 0.12);
   border-radius: 16px;
+/* If a fullscreen surface appears inside, ensure fixed positioning anchors to viewport */
+.view-panel:has(.globe-area-60.globe-fullscreen) {
+  transform: none !important;
+  z-index: 999; /* ensure stacking above siblings */
+}
   padding: 24px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   border: none;
@@ -29,9 +34,155 @@
   transform: translateY(25px);
   animation: fadeInUp 0.7s cubic-bezier(.4, 0, .2, 1) forwards;
   overflow: hidden;
-  display: flex;
+  z-index: 999;
   flex-direction: column;
   gap: 12px;
+}
+
+/* Hide the view toggle when in fullscreen */
+body:has(.globe-area-60.globe-fullscreen) .view-toggle {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Marker tooltip */
+.marker-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.marker-tooltip .muted {
+  color: #aaa;
+  font-size: 12px;
+}
+
+/* Map marker styles */
+.map-marker {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #ffb347;
+  border: 2px solid #ff7a00;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-marker:hover {
+  background: #ffd700;
+  border-color: #ff9900;
+  transform: scale(1.1);
+}
+
+/* Popup styles */
+.popup-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(5px);
+}
+
+.popup-card {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-card h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.popup-card .muted {
+  color: var(--muted);
+  margin: 5px 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.popup-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-track {
+  background: #28a745;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-tracked {
+  background: #6c757d;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.popup-close:hover {
+  color: white;
+}
+
+/* Hint badge in fullscreen */
+.fullscreen-hint {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.6);
+  color: #e6f9ff;
+  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  user-select: none;
 }
 
 /* 🔹 Hover effect */
@@ -57,17 +208,19 @@
 }
 
 @font-face {
-  font-family: 'Tuffy';
-  src: url('https://fontlibrary.org/assets/fonts/tuffy/ef95bd85856d8d80c0cd2af2cefc2066/e4e367ffc6d73b429bf485b4276f258c/TuffyRegular.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: 'Tuffy';
-  src: url('https://fontlibrary.org/assets/fonts/tuffy/ef95bd85856d8d80c0cd2af2cefc2066/bcf94bd0d63156553c9e4fd40d0b46bd/TuffyBold.ttf') format('truetype');
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
+  font-display: swap;
 }
 
 :root {
@@ -77,8 +230,8 @@
   --accent: #00b8ff;
   --accent-2: #ffb347;
   --gradient-1: linear-gradient(120deg, rgba(4, 241, 234, 0.1), rgba(0, 184, 255, 0.1));
-  --font-primary: 'Tuffy', sans-serif;
-  --font-heading: 'Tuffy', sans-serif;
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* Reset and Global Styles */
@@ -307,6 +460,97 @@ h3 { font-size: 0.88rem; }
   margin-top: 24px;
 }
 
+.view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 4px;
+  background: rgba(12, 21, 33, 0.4);
+  border: 1px solid rgba(4, 241, 234, 0.08);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+}
+
+.toggle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #b0c3d6;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-button:hover {
+  color: #e6f9ff;
+  border-color: rgba(4, 241, 234, 0.18);
+}
+
+.toggle-button.active {
+  background: linear-gradient(135deg, rgba(4, 241, 234, 0.22), rgba(0, 184, 255, 0.28));
+  color: #071018;
+  border-color: rgba(4, 241, 234, 0.28);
+  box-shadow: 0 8px 24px rgba(4, 241, 234, 0.18);
+}
+
+.toggle-label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.view-stack {
+  position: relative;
+  height: 60vh;
+  margin-bottom: 28px;
+}
+
+.view-panel {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.985);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.view-panel.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+  z-index: 2;
+}
+
+/* Fallback: explicitly remove transform via a class applied from React */
+.view-panel.no-transform {
+  transform: none !important;
+  z-index: 999;
+}
+
+/* When a fullscreen surface exists inside, remove the transform so position:fixed uses the viewport */
+.view-panel:has(.globe-area-60.globe-fullscreen) {
+  transform: none !important;
+  z-index: 999; /* ensure stacking above siblings */
+}
+
+.view-panel .globe-area-60 {
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.globe-area-60.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .globe-area,
 /* Modern, bright, glassy globe container */
 .globe-area-60 {
@@ -333,11 +577,102 @@ h3 { font-size: 0.88rem; }
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 50;
+  z-index: 999;
   margin: 0;
   border-radius: 0;
+}
+
+/* Hide the view toggle and other sections when fullscreen is active (modern browsers) */
+body:has(.globe-area-60.globe-fullscreen) .view-toggle,
+body:has(.globe-area-60.globe-fullscreen) .top-section,
+body:has(.globe-area-60.globe-fullscreen) .cards-section {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hint badge shown in fullscreen to exit */
+.fullscreen-hint {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.6);
+  color: #e6f9ff;
+  font-size: 12px;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  user-select: none;
+}
+
+.map-view .leaflet-container {
+  background: rgba(3, 12, 20, 0.8);
+}
+
+.map-marker-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.map-marker-icon .marker-core {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffdda1, #ff8c32 75%);
+  box-shadow: 0 0 12px rgba(255, 140, 50, 0.6);
+}
+
+.map-marker-icon .marker-pulse {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 184, 71, 0.45);
+  animation: markerPulse 1.8s ease-out infinite;
+}
+
+@keyframes markerPulse {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.map-popup .leaflet-popup-content-wrapper {
+  background: rgba(11, 17, 26, 0.9);
+  color: #f0f6ff;
+  border-radius: 12px;
+  border: 1px solid rgba(4, 241, 234, 0.12);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+.map-popup .leaflet-popup-tip {
+  background: rgba(11, 17, 26, 0.9);
+  border: 1px solid rgba(4, 241, 234, 0.12);
+}
+
+.map-popup-content h3 {
+  font-size: 1rem;
+  margin: 0 0 4px 0;
+}
+
+.map-popup-content p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #c2d6e6;
 }
 
 /* Fade out animation for homepage elements */
