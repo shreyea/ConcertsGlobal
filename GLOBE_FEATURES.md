@@ -42,6 +42,8 @@
    - Added `controlsRef` for OrbitControls
    - Configured OrbitControls with zoom limits (4-10 distance)
    - Applied conditional `globe-fullscreen` class
+   - Uses a `group` rotation so the sphere texture and latitude/longitude markers stay synchronized without mirroring
+   - Loads procedurally generated `earth_latlong_texture.png` for precise marker alignment
 
 2. **`src/pages/Home.jsx`**
    - Added `fade-out` class to top-section when globe is active
@@ -54,6 +56,20 @@
    - Updated `.globe-area-60.globe-fullscreen` for fullscreen mode
    - Added transitions to `.top-section` and `.cards-section`
    - Improved `.cards-section` with flex-wrap and proper spacing
+
+4. **`scripts/generateEarthTexture.js`**
+   - Node script that draws an equirectangular Earth texture with a 15° graticule using `canvas`, `d3-geo`, and `world-atlas`
+   - Outputs `public/earth_latlong_texture.png` to ensure latitude/longitude markers land accurately
+
+### Regenerating the Globe Texture
+
+Run the helper script whenever you want a fresh texture (for example, to tweak colors or grid density):
+
+```bash
+npm run generate:texture
+```
+
+The command exports `public/earth_latlong_texture.png` (4096x2048 equirectangular map) with highlighted meridians, parallels, and country outlines. Because the projection matches the `latLngToXYZ` helper, event markers should align perfectly with their geographic coordinates.
 
 ### CSS Classes:
 
