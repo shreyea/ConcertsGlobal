@@ -24,6 +24,17 @@
   text-decoration: none;
 }
 
+.nav-brand .brand-text {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.nav-brand .nav-logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .nav-logo {
   width: 36px;
   height: 36px;

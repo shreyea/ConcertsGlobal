@@ -18,11 +18,11 @@ export default function BackgroundParticles({ id = "tsparticles-bg" }) {
         left: 0,
         width: "100%",
         height: "100%",
-        zIndex: -1,
-        pointerEvents: "none", // prevent accidental interaction glitches
+        zIndex: 0,
+        pointerEvents: "none",
       }}
       options={{
-        background: { color: { value: "#8ea3bfff" } }, // soft, minimal dark
+        background: { color: { value: "transparent" } },
         fpsLimit: 60,
         interactivity: {
           events: {
@@ -32,15 +32,34 @@ export default function BackgroundParticles({ id = "tsparticles-bg" }) {
           },
         },
         particles: {
-          number: { value: 60, density: { enable: true, area: 900 } }, // fewer particles
-          color: { value: "#62a4eeff" }, // soft gray
+          number: { value: 120, density: { enable: true, area: 1000 } },
+          color: { value: ["#4a9eff", "#7dd3fc", "#fbbf24"] },
           links: {
             enable: false,
           },
-          move: { enable: true, speed: 0.5, outModes: { default: "out" } },
-          opacity: { value: 0.18 }, // very subtle
+          move: { 
+            enable: true, 
+            speed: 0.8, 
+            direction: "none",
+            random: true,
+            straight: false,
+            outModes: { default: "out" } 
+          },
+          opacity: { 
+            value: 0.4,
+            random: { enable: true, minimumValue: 0.1 },
+            animation: { 
+              enable: true, 
+              speed: 1, 
+              minimumValue: 0.1, 
+              sync: false 
+            }
+          },
           shape: { type: "circle" },
-          size: { value: { min: 1, max: 2.2 } },
+          size: { 
+            value: { min: 1, max: 3.5 },
+            random: { enable: true, minimumValue: 0.5 }
+          },
         },
         detectRetina: true,
       }}

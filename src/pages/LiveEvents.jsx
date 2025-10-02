@@ -16,11 +16,11 @@ export default function LiveEvents() {
   }, []);
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
+    <div className="page-root page-live-events" style={{ position: "relative", minHeight: "100vh", overflow: "hidden" }}>
       <BackgroundParticles id="live-bg" />
 
       <div
-        className="page"
+        className="page live-events"
         style={{
           position: "relative",
           zIndex: 1,

@@ -115,13 +115,20 @@ export default function MapView({
             position={event.position}
             icon={markerIcon}
             eventHandlers={{
-              click: (e) => {
-                e.originalEvent.stopPropagation();
+              click: () => {
                 onSurfaceActivate();
                 onMarkerClick(event);
               }
             }}
-          />
+          >
+            <Popup className="map-popup">
+              <div className="map-popup-content">
+                <h3>{event.artist || event.name}</h3>
+                <p>{event.city}</p>
+                {event.date ? <p>{event.date}</p> : null}
+              </div>
+            </Popup>
+          </Marker>
         ))}
       </MapContainer>
     </div>

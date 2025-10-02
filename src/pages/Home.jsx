@@ -166,7 +166,7 @@ useEffect(() => {
   });
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+    <div className="page-root page-home" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
       <BackgroundParticles id="home-bg" />
       
       <div style={{ position: 'absolute', inset: 0, width: '100vw', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
@@ -174,7 +174,8 @@ useEffect(() => {
           <Stars radius={100} depth={100} count={1000} factor={1} fade />
         </Canvas>
       </div>
-  <main className="main-container" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
+  <div className="page home" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
+    <main className="main-container" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
 
         <section className={`top-section ${surfaceActive ? 'fade-out' : ''}`}>
           <Stats events={filtered} liked={liked} />
@@ -237,7 +238,9 @@ useEffect(() => {
         </section>
 
         <section className={`cards-section${surfaceActive ? " fade-out" : ""}`}>
-          {filtered.map(ev => <EventCard key={ev.id} event={ev} onOpen={(e)=>setSelected(e)} />)}
+         
+          {filtered.map(ev => <EventCard key={ev.id} event={ev} onOpen={(e)=>setSelected(e)} />)} 
+         
         </section>
 
         {selected && <Popup concert={selected} onClose={() => {
@@ -245,6 +248,7 @@ useEffect(() => {
           setSurfaceActive(false);
         }} />}
       </main>
+    </div>
 
       {surfaceActive && (
         <div className="fullscreen-hint">Press H to escape</div>

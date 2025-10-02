@@ -14,9 +14,9 @@ export default function Stats({ events, liked }) {
         <div className="stat-number">{total}</div>
         <div className="stat-label">Total Events</div>
       </Link>
-      <Link to="/liked" className="stat-card" style={{ textDecoration: 'none', color: 'inherit' }}>
+      <Link to="/tracked" className="stat-card" style={{ textDecoration: 'none', color: 'inherit' }}>
         <div className="stat-number">{liked.length}</div>
-        <div className="stat-label">Liked</div>
+        <div className="stat-label">Tracked</div>
       </Link>
     </section>
   );

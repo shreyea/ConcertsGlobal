@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
-import EventCard from "../components/EventCard";
+import React, { useContext, useEffect, useState } from "react";
+import { AppContext } from "../context/AppContext";
 import BackgroundParticles from "../components/BackgroundParticles";
+import { getConcerts } from "../api/concertsApi";
+import EventCard from "../components/EventCard";
 
 
 function distanceKm(lat1, lon1, lat2, lon2) {
@@ -15,6 +17,7 @@ export default function AllEvents() {
   const [events, setEvents] = useState([]);
   const [pos, setPos] = useState(null);
   const [visibleCount, setVisibleCount] = useState(0);
+  const { liked, toggleLike, notify, getEventKey } = useContext(AppContext);
 
   useEffect(() => {
     // Fetch concerts from backend API
@@ -76,9 +79,9 @@ export default function AllEvents() {
   }, [events]);
 
   return (
-    <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+    <div className="page-root page-all-events" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
       <BackgroundParticles />
-      <div className="page" style={{ position: 'relative', zIndex: 1 }}>
+  <div className="page all-events" style={{ position: 'relative', zIndex: 1 }}>
         <h2>All Events</h2>
         {!pos && <p className="muted">Location unavailable or blocked. Distance will not be shown.</p>}
         <div className="cards-grid">
@@ -87,19 +90,10 @@ export default function AllEvents() {
           ) : (
             events.map((ev, idx) => {
               const isVisible = idx < visibleCount;
+              const dist = (pos && typeof ev.lat === 'number' && typeof ev.lng === 'number') ? distanceKm(pos.lat, pos.lng, ev.lat, ev.lng) : null;
               return (
-                <div
-                  className="event-card"
-                  key={ev.id}
-                  
-                >
-                  <h3>{ev.name}</h3>
-                  <p>{ev.city}</p>
-                  {pos && typeof ev.lat === 'number' && typeof ev.lng === 'number' && (
-                    <p style={{ color: '#9aa6b2', fontSize: '0.95rem' }}>
-                      {distanceKm(pos.lat, pos.lng, ev.lat, ev.lng).toFixed(1)} km away
-                    </p>
-                  )}
+                <div className="ae" key={ev.id} >
+                  <EventCard event={{...ev, distanceKm: dist}} onOpen={() => { /* open popup could be wired here */ }} style={{ animationDelay: `${idx * 100}ms` }} />
                 </div>
               );
             })

@@ -2,92 +2,91 @@ import React from "react";
 import BackgroundParticles from "../components/BackgroundParticles";
 import Footer from "../components/Footer";
 
-
 /**
- * Enhanced Login Component
+ * Enhanced Login Component with Darker Background
  */
 export default function Login() {
   const styles = {
     // --- Global Container Styles ---
     container: {
       position: "relative",
-     
+      minHeight: "100vh",
       display: "flex",
-      
       justifyContent: "center",
-      alignItems: "top",
+      alignItems: "center",
       fontFamily: 'Inter, Roboto, Segoe UI, Arial, sans-serif',
-      backgroundColor: "#121212",
+      background: "linear-gradient(135deg, #0a0a13 0%, #181a23 100%)",
       overflow: "hidden",
-      marginTop: "10vh",
-      marginBottom: "30vh",
     },
 
-    // --- Login Card Styles ---
+    // --- Login Card Styles (kept minimal because CSS class handles visual) ---
     loginCard: {
-      background: "rgba(255, 255, 255, 0.05)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
-      borderRadius: "16px",
-      padding: "32px 24px",
-      width: "320px",
-      backdropFilter: "blur(10px)",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
+      borderRadius: "20px",
+      padding: "40px 32px",
+      width: "340px",
       textAlign: "center",
       zIndex: 1,
-      
     },
 
     // --- Header ---
     header: {
-      color: "white",
-      marginBottom: "18px",
-      fontSize: "1.2rem",
-      fontWeight: "600",
+      color: "#f3f6fa",
+      marginBottom: "22px",
+      fontSize: "1.45rem",
+      fontWeight: "700",
+      letterSpacing: "0.5px",
+      textShadow: "0 2px 8px rgba(0,0,0,0.25)",
     },
 
     // --- Form Styles ---
     form: {
       display: "flex",
       flexDirection: "column",
-      gap: "14px",
+      gap: "16px",
       width: "100%",
     },
 
     // --- Input Styles ---
     input: {
-      padding: "10px 12px",
-      background: "rgba(255, 255, 255, 0.1)",
-      border: "1px solid rgba(255, 255, 255, 0.2)",
-      borderRadius: "8px",
-      color: "white",
-      fontSize: "0.95rem",
+      padding: "12px 14px",
+      background: "rgba(30, 32, 48, 0.95)",
+      border: "1.5px solid rgba(255, 255, 255, 0.12)",
+      borderRadius: "10px",
+      color: "#e6e9f0",
+      fontSize: "1rem",
+      outline: "none",
+      transition: "border 0.2s",
+      boxShadow: "0 1px 4px 0 rgba(0,0,0,0.12)",
     },
 
     // --- Button Styles ---
     button: {
-      padding: "10px 18px",
-      background: "#02456cff",
+      padding: "12px 0",
+      background: "linear-gradient(90deg, #02456c 0%, #0273ba 100%)",
       border: "none",
-      borderRadius: "8px",
+      borderRadius: "10px",
       color: "white",
       cursor: "pointer",
-      fontSize: "1rem",
-      fontWeight: "600",
-      marginTop: "8px",
-      transition: "background 0.3s ease, transform 0.1s ease",
+      fontSize: "1.08rem",
+      fontWeight: "700",
+      marginTop: "10px",
+      transition: "background 0.3s, transform 0.1s",
+      boxShadow: "0 2px 8px 0 rgba(2,67,108,0.18)",
     },
 
     // --- Utility Links ---
     utilityText: {
-      marginTop: "10px",
-      fontSize: "0.85rem",
+      marginTop: "16px",
+      fontSize: "0.93rem",
+      color: "#b0b4c0",
     },
 
     utilityLink: {
-      color: "#0273baff",
+      color: "#3fa7ff",
       textDecoration: "none",
       margin: "0 5px",
       fontWeight: "500",
+      transition: "color 0.2s",
     },
   };
 
@@ -104,7 +103,7 @@ export default function Login() {
     setLoading(false);
     if (res.success && res.token) {
       localStorage.setItem('token', res.token);
-      window.location.href = "/"; // redirect to home or dashboard
+      window.location.href = "/";
     } else {
       setError(res.error || "Login failed");
     }
@@ -124,9 +123,10 @@ export default function Login() {
   }
 
   return (
-    <div style={styles.container}>
+    <div className="page-root page-login" style={styles.container}>
       <BackgroundParticles id="login-bg" />
-      <div style={styles.loginCard}>
+      <div className="page login" style={{ position: 'relative', zIndex: 1 }}>
+        <div className={`surface-blur`} style={styles.loginCard}>
         <h1 style={styles.header}>Welcome Back!</h1>
         <form style={styles.form} onSubmit={handleLogin}>
           <input
@@ -147,15 +147,18 @@ export default function Login() {
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
-          <button style={styles.button} disabled={loading}>{loading ? "Logging in..." : "Log In Securely"}</button>
+          <button style={styles.button} disabled={loading}>
+            {loading ? "Logging in..." : "Log In Securely"}
+          </button>
         </form>
         <div style={styles.utilityText}>
           <a href="#" style={styles.utilityLink}>Forgot Password?</a>
-          <span style={{ color: "#A0A0A0" }}> | </span>
-          <span style={{ color: "#A0A0A0" }}>Need an account?</span>
+          <span style={{ color: "#6a6e7a" }}> | </span>
+          <span style={{ color: "#6a6e7a" }}>Need an account?</span>
           <a href="#" style={styles.utilityLink} onClick={handleSignup}> Sign Up</a>
         </div>
-        {error && <div style={{ color: 'red', marginTop: 10 }}>{error}</div>}
+        {error && <div style={{ color: '#ff4d4f', marginTop: 14, fontWeight: 500 }}>{error}</div>}
+        </div>
       </div>
     </div>
   );
