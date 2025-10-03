@@ -110,8 +110,8 @@ export default function Globe({
       onClick={handleActivate}
       role="presentation"
     >
-      <Canvas style={{ width: '100%', height: '100%' }} camera={{ position: [0, 0, 6], fov: 45 }}>
-        <ambientLight intensity={0.6}/>
+  <Canvas className="globe-canvas" camera={{ position: [0, 0, 6], fov: 45 }}>
+        <ambientLight intensity={1}/>
         <directionalLight position={[5,5,5]} intensity={0.7}/>
         <Stars radius={100} depth={50} count={1000} factor={4} fade />
 

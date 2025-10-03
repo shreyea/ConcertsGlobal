@@ -9,6 +9,8 @@ import Filters from "../components/Filters";
 import EventCard from "../components/EventCard";
 import Popup from "../components/Popup";
 import BackgroundParticles from "../components/BackgroundParticles";
+import Footer from "../components/Footer";
+import ProfessionalSection from "../components/ProfessionalSection";
 
 import { AppContext } from "../context/AppContext";
 
@@ -166,16 +168,16 @@ useEffect(() => {
   });
 
   return (
-    <div className="page-root page-home" style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
+    <div className="page-root page-home page-home-wrapper">
       <BackgroundParticles id="home-bg" />
       
-      <div style={{ position: 'absolute', inset: 0, width: '100vw', height: '100vh', zIndex: 0, pointerEvents: 'none' }}>
-        <Canvas style={{ width: '100vw', height: '100vh' }}>
+      <div className="home-bg-overlay">
+        <Canvas className="home-bg-canvas">
           <Stars radius={100} depth={100} count={1000} factor={1} fade />
         </Canvas>
       </div>
-  <div className="page home" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
-    <main className="main-container" style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
+  <div className="page home page-home-main">
+    <main className="main-container main-container-full">
 
         <section className={`top-section ${surfaceActive ? 'fade-out' : ''}`}>
           <Stats events={filtered} liked={liked} />
@@ -253,6 +255,10 @@ useEffect(() => {
       {surfaceActive && (
         <div className="fullscreen-hint">Press H to escape</div>
       )}
+
+      <ProfessionalSection />
+
+      <Footer />
     </div>
   );
 
