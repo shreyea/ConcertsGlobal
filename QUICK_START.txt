@@ -1,0 +1,89 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                    AI EVENT PLANNER - QUICK START                ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📋 CHECKLIST:
+  ☐ 1. Get OpenAI API key → https://platform.openai.com/api-keys
+  ☐ 2. Edit startup script with your key (see below)
+  ☐ 3. Run AI proxy server
+  ☐ 4. Run dev server
+  ☐ 5. Test in browser
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🖥️  WINDOWS SETUP:
+
+  1. Open:  start-ai-server.bat  (in Notepad)
+  
+  2. Find:  set OPENAI_API_KEY=YOUR_OPENAI_API_KEY_HERE
+  
+  3. Replace YOUR_OPENAI_API_KEY_HERE with your actual key
+  
+  4. Save and run:  start-ai-server.bat
+  
+  5. In another terminal:  npm run dev
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🍎 MAC/LINUX/GIT BASH SETUP:
+
+  1. Open:  start-ai-server.sh  (in text editor)
+  
+  2. Find:  export OPENAI_API_KEY="YOUR_OPENAI_API_KEY_HERE"
+  
+  3. Replace YOUR_OPENAI_API_KEY_HERE with your actual key
+  
+  4. Save and run:  bash start-ai-server.sh
+  
+  5. In another terminal:  npm run dev
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ SUCCESS LOOKS LIKE:
+
+  Terminal 1 (AI Proxy):
+    AI proxy & plan server listening on http://localhost:4001
+    
+  Terminal 2 (React):
+    VITE v7.x.x  ready in XXX ms
+    ➜  Local:   http://localhost:5173/
+
+  Browser:
+    Click event → Plan → Enable AI → Generate → See suggestions! 🎉
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 TROUBLESHOOTING:
+
+  "insufficient_quota"
+    → Add billing at https://platform.openai.com/account/billing
+  
+  "Connection Error"
+    → Start AI proxy: start-ai-server.bat or bash start-ai-server.sh
+  
+  "Port 4001 in use"
+    → Kill process: netstat -ano | findstr :4001
+    → Then: taskkill /PID <PID> /F
+  
+  "OPENAI_API_KEY not configured"
+    → Edit startup script and add your key
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 MORE INFO:
+  
+  START_HERE.md    ← Quick start guide
+  SETUP_AI.md      ← Full setup & troubleshooting
+  PROJECT_STATUS.md ← What was fixed & why
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 COST: ~$0.001-0.003 per AI suggestion (using gpt-4o-mini)
+
+🔒 SECURITY: API key stays on server, never exposed to browser
+
+⏱️  SETUP TIME: < 2 minutes
+
+╔══════════════════════════════════════════════════════════════════╗
+║              Ready? Edit startup script & launch! 🚀              ║
+╚══════════════════════════════════════════════════════════════════╝

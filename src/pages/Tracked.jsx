@@ -1,10 +1,13 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import BackgroundParticles from "../components/BackgroundParticles";
+import EventCard from "../components/EventCard";
+import Popup from "../components/Popup";
 import { AppContext } from "../context/AppContext";
 
 export default function Tracked() {
   const { tracked, liked, toggleLike, getEventKey } = useContext(AppContext);
+  const [selected, setSelected] = React.useState(null);
   const items = Array.isArray(tracked) ? tracked : (Array.isArray(liked) ? liked : []);
 
   // optional debug display for event keys
@@ -25,40 +28,24 @@ export default function Tracked() {
           ) : (
             items.map((ev) => {
               const key = getEventKey ? getEventKey(ev) : (ev._id || ev.id || `${ev.name}::${ev.city}::${ev.date}`);
+              // Render the shared EventCard component which already provides Details, Plan, Track
               return (
-                <div key={key} className={`event-card stat-card`}> 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 className="event-title">{ev.name || ev.artist || "Event"}</h3>
+                <div key={key} className="stat-card" style={{ width: '100%' }}>
+                  <EventCard
+                    event={ev}
+                    onOpen={(e) => setSelected(e)}
+                    style={{ marginBottom: 12 }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
                     <span className="tracked-badge">Tracked</span>
                   </div>
-                  <div className="event-meta"><b>Artist:</b> {ev.artist || "TBA"}</div>
-                  <div className="event-meta"><b>Date:</b> {ev.date || "TBA"}</div>
-                  <div className="event-meta"><b>City:</b> {ev.city || "TBA"}{ev.country ? `, ${ev.country}` : ''}</div>
-                  {ev.genre && <div className="event-meta"><b>Genre:</b> {ev.genre}</div>}
-
                   {showKeys && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Key: {key}</div>}
-
-                  <div style={{ marginTop: 12 }} className="event-actions">
-                    <button
-                      className="btn btn-tracked"
-                      onClick={() => toggleLike(ev)}
-                    >
-                      Untrack
-                    </button>
-                    <a
-                      href={ev.ticket_url || ev.tickets || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-primary"
-                    >
-                      🎟 Tickets
-                    </a>
-                  </div>
                 </div>
               );
             })
           )}
         </div>
+        {selected && <Popup concert={selected} onClose={() => setSelected(null)} />}
       </div>
     </div>
   );

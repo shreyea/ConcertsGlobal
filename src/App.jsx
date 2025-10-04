@@ -9,12 +9,14 @@ import AroundMe from "./pages/AroundMe";
 import Login from "./pages/Login";
 import AllEvents from "./pages/AllEvents";
 import LiveEvents from "./pages/LiveEvents";
+import Plan from "./pages/Plan";
 import PressKit from "./pages/PressKit";
 import Support from "./pages/Support";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import About from "./pages/About";
+import ViewPlan from "./pages/ViewPlan";
 import { AppContext } from "./context/AppContext";
 
 
@@ -31,6 +33,8 @@ export default function App(){
         <Route path="/login" element={<Login />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/live-events" element={<LiveEvents />} />
+  <Route path="/plan" element={<Plan />} />
+  <Route path="/plan/:id" element={<Plan />} />
         <Route path="/tracked" element={<Tracked/>} />
         <Route path="/press-kit" element={<PressKit/>} />
         <Route path="/support" element={<Support/>} />
@@ -38,6 +42,7 @@ export default function App(){
         <Route path="/terms" element={<Terms/>} />
         <Route path="/cookies" element={<Cookies/>} />
         <Route path="/about" element={<About/>} />
+        <Route path="/plans/:id" element={<ViewPlan/>} />
       </Routes>
       {toast && (
         <div className="global-toast" role="status" aria-live="polite">{toast}</div>

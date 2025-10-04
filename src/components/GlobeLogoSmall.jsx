@@ -3,42 +3,68 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useEffect, useState } from 'react';
 import { OrbitControls, Stars, Html } from "@react-three/drei";
+
 function SmallGlobe({ size = 56 }) {
   const globeRef = useRef();
   const starRef = useRef();
   const ringRef = useRef();
+  const ringGlowRef = useRef();
+  const ringStarRef = useRef();
+  const ringSparkRef = useRef();
   const highlightRef = useRef();
 
   const [texture, setTexture] = useState(null);
   const [texLoaded, setTexLoaded] = useState(false);
 
-  // load texture with explicit callbacks so we can detect failures
+  // progressive load: low-res first, then high-res replacement for fast visible paint
   useEffect(() => {
-    const url = "/earth_latlong_texture.png";
     const loader = new THREE.TextureLoader();
     let mounted = true;
-    loader.load(
-      url,
-      (tex) => {
-        if (mounted) {
-                  tex.wrapS = THREE.RepeatWrapping;
-                  tex.wrapT = THREE.ClampToEdgeWrapping;
-                  tex.repeat.x = 1;
-                  tex.offset.x = 0;
-                  tex.anisotropy = 12;
-                  tex.encoding = THREE.sRGBEncoding;
-                  tex.needsUpdate = true;
-                  setTexture(tex);
-                  setTexLoaded(true);
-                  console.debug('[GlobeLogoSmall] texture loaded (success)', url, tex.image && { width: tex.image.width, height: tex.image.height });
-                }
-              },
-      undefined,
-      (err) => {
-        console.warn('[GlobeLogoSmall] failed to load texture', url, err);
-        setTexLoaded(false);
-      }
-    );
+    const lowRes = "/earth_texture1.jpg";
+    const highRes = "/earth_latlong_texture.png";
+
+    loader.load(lowRes, (lowTex) => {
+      if (!mounted) return;
+      try {
+        lowTex.wrapS = THREE.RepeatWrapping;
+        lowTex.wrapT = THREE.ClampToEdgeWrapping;
+        lowTex.repeat.x = 1;
+        lowTex.anisotropy = 4;
+        lowTex.encoding = THREE.sRGBEncoding;
+        lowTex.generateMipmaps = false;
+        lowTex.needsUpdate = true;
+        setTexture(lowTex);
+        setTexLoaded(true);
+      } catch (e) {}
+
+      // then load high-res and swap in
+      loader.load(highRes, (hiTex) => {
+        if (!mounted) return;
+        try {
+          hiTex.wrapS = THREE.RepeatWrapping;
+          hiTex.wrapT = THREE.ClampToEdgeWrapping;
+          hiTex.anisotropy = Math.min(16, hiTex.anisotropy || 8);
+          hiTex.encoding = THREE.sRGBEncoding;
+          hiTex.generateMipmaps = true;
+          hiTex.needsUpdate = true;
+          setTexture(hiTex);
+          setTexLoaded(true);
+        } catch (e) {}
+      }, undefined, (err) => { console.warn('[GlobeLogoSmall] hi-res load failed', err); });
+    }, undefined, (err) => {
+      console.warn('[GlobeLogoSmall] low-res load failed', err);
+      // fallback to high-res directly
+      loader.load(highRes, (hiTex) => {
+        if (!mounted) return;
+        hiTex.wrapS = THREE.RepeatWrapping;
+        hiTex.wrapT = THREE.ClampToEdgeWrapping;
+        hiTex.encoding = THREE.sRGBEncoding;
+        hiTex.needsUpdate = true;
+        setTexture(hiTex);
+        setTexLoaded(true);
+      }, undefined, (err2) => { console.warn('[GlobeLogoSmall] high-res also failed', err2); setTexLoaded(false); });
+    });
+
     return () => { mounted = false; };
   }, []);
 
@@ -58,11 +84,31 @@ function SmallGlobe({ size = 56 }) {
 
   useFrame((state, delta) => {
     if (globeRef.current) {
-      globeRef.current.rotation.y += delta * 0.15; // slow rotate
+      globeRef.current.rotation.y += delta * 0.2; // slow rotate
     }
     if (ringRef.current) {
       // rotate ring slowly around globe
-      ringRef.current.rotation.z += delta * 0.32;
+      ringRef.current.rotation.y += delta * 0.32;
+    }
+    if (ringGlowRef.current) {
+      // gentle pulse for the glow rim
+      const g = 0.16 + Math.sin(state.clock.getElapsedTime() * 1.1) * 0.03;
+      ringGlowRef.current.material.opacity = Math.max(0.04, g);
+    }
+    if (ringSparkRef.current) {
+      const ta = state.clock.getElapsedTime() * 1.8;
+      const r = 1.15;
+      // orbit spark around ring in local ring coordinates
+      ringSparkRef.current.position.x = Math.cos(ta) * r;
+      ringSparkRef.current.position.z = Math.sin(ta) * r ;//* 0.12;
+      ringSparkRef.current.position.y = 0;//Math.sin(ta * 2.2) * 0.04;
+      ringSparkRef.current.material.emissiveIntensity = 1.2 + Math.sin(ta * 6) * 0.6;
+    }
+    if (ringStarRef.current) {
+      // small local pulse for star sitting on ring
+      const tt = state.clock.getElapsedTime();
+      const ss = 1 + Math.sin(tt * 6.5) * 0.2;
+      ringStarRef.current.scale.set(ss, ss, ss);
     }
     if (starRef.current) {
       // shimmer the star (scale pulse)
@@ -70,8 +116,8 @@ function SmallGlobe({ size = 56 }) {
       const s = 1 + Math.sin(t * 6) * 0.18;
       starRef.current.scale.set(s, s, s);
       // slight orbit around globe
-      starRef.current.position.x = Math.cos(t * 0.9) * 0.9 + 1.1;
-      starRef.current.position.y = Math.sin(t * 0.9) * 0.35 + 0.25;
+     // starRef.current.position.x = Math.cos(t * 0.9) * 0.9 + 1.1;
+     // starRef.current.position.y = Math.sin(t * 0.9) * 0.35 + 0.25;
     }
 
     if (highlightRef.current) {
@@ -89,14 +135,22 @@ function SmallGlobe({ size = 56 }) {
           <mesh>
             {/* lower subdivisions for navbar performance */}
             <sphereGeometry args={[0.85, 32, 32]} />
-            <meshStandardMaterial map={texture} metalness={0.15} roughness={0.6} emissive="#001018" emissiveIntensity={1} />
+            <meshStandardMaterial 
+              map={texture} 
+              metalness={0.18} 
+              roughness={0.52} 
+              emissive="#001018" 
+              emissiveIntensity={0.7}
+              transparent
+              opacity={0.93}
+            />
           </mesh>
         ) : (
           // fallback visual: deep ocean color with a faint cloud layer so it reads like a globe
           <>
             <mesh>
               <sphereGeometry args={[0.85, 32, 32]} />
-              <meshStandardMaterial color="#06324a" metalness={0.05} roughness={0.7} emissive="#001318" emissiveIntensity={0.02} />
+              <meshStandardMaterial color="#06324a" metalness={0.08} roughness={0.7} emissive="#001318" emissiveIntensity={0.04} transparent opacity={0.93} />
             </mesh>
           
           </>
@@ -110,12 +164,12 @@ function SmallGlobe({ size = 56 }) {
       </group>
 
       {/* orbital ring around the globe */}
-      <group ref={ringRef} className="globe-orbit-rotate" rotation={[Math.PI / 2.2, 0, Math.PI / 6]}>
+  <group ref={ringRef} className="globe-orbit-rotate" rotation={[Math.PI / 2, 0, 0]}>
         <mesh>
           <torusGeometry args={[1.15, 0.015, 16, 64]} />
           <meshStandardMaterial 
-            color="#4a9eff" 
-            emissive="#2a7edf" 
+            color="#033f83ff" 
+            emissive="#023168ff" 
             emissiveIntensity={0.4}
             transparent
             opacity={0.6}
@@ -123,28 +177,56 @@ function SmallGlobe({ size = 56 }) {
             roughness={0.2}
           />
         </mesh>
+        {/* soft glow rim slightly larger than the torus */}
+        <mesh ref={ringGlowRef} rotation={[0, 0, 0]}> 
+          <torusGeometry args={[1.165, 0.02, 16, 64]} />
+          <meshBasicMaterial color="#1a69c3ff" transparent opacity={0.08} depthWrite={false} />
+        </mesh>
+        {/* small star pinned on the ring */}
+        <mesh ref={ringStarRef} position={[1.15, 0, 0]}>
+          <sphereGeometry args={[0.05, 12, 12]} />
+          <meshStandardMaterial color="#fff1a8" emissive="#ffd76b" emissiveIntensity={1.6} />
+        </mesh>
+        {/* moving spark that orbits along the ring */}
+        <mesh ref={ringSparkRef} position={[1.15, 2, 15]}> 
+          <sphereGeometry args={[0.05, 10, 10]} />
+          <meshStandardMaterial color="#fff7d9" emissive="#fff7d9" emissiveIntensity={8} metalness={0.2} roughness={0.1} transparent />
+        </mesh>
       </group>
 
       {/* shimmering star to the right */}
-      <mesh ref={starRef} position={[1.1, 0.25, 0.2]}>
-        <sphereGeometry args={[0.06, 16, 16]} />
+      <mesh ref={starRef} position={[1, -1, 0]}>
+        <sphereGeometry args={[0.1, 20, 20]} />
         <meshStandardMaterial color="#ffd76b" emissive="#ffd76b" emissiveIntensity={1.6} />
       </mesh>
-
+       
       {/* small moving highlight light to add specular pop */}
-      <pointLight ref={highlightRef} color={0xffffff} intensity={0.6} distance={3} decay={2} />
+      <pointLight ref={highlightRef} color={0xffffff} intensity={1} distance={3} decay={2} />
     </group>
   );
 }
 
 export default function GlobeLogoSmall({ size = 56 }) {
+  const [isSmall, setIsSmall] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsSmall(typeof window !== 'undefined' ? window.innerWidth <= 600 : false);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  // lower DPR and disable antialias on small screens to save GPU/CPU
+  const dprProp = isSmall ? [1, 1.25] : [1, 2];
+  const glSettings = { antialias: !isSmall };
+
   return (
     <div className="nav-logo nav-logo-size" style={{ display: 'inline-block' }}>
       <Canvas
         className="nav-logo-canvas"
         camera={{ position: [0, 0, 3.2], fov: 40 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true }}
+        dpr={dprProp}
+        gl={glSettings}
         onCreated={({ gl }) => { gl.outputEncoding = THREE.sRGBEncoding; console.debug('[GlobeLogoSmall] gl outputEncoding set', gl.outputEncoding); }}
       >
         <ambientLight intensity={1} />

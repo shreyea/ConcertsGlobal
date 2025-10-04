@@ -60,22 +60,46 @@ export default function Globe({
   useEffect(() => {
     mountedRef.current = true;
     const loader = new THREE.TextureLoader();
-    loader.load(
-      "/earth_latlong_texture.png",
-      (tex) => { 
-        if (mountedRef.current) {
-          tex.wrapS = THREE.RepeatWrapping;
-          tex.wrapT = THREE.ClampToEdgeWrapping;
-          tex.repeat.x = 1;
-          tex.offset.x = 0;
-          tex.anisotropy = 12;
-          tex.needsUpdate = true;
-          setTexture(tex);
-        }
-      },
-      undefined,
-      (err) => { console.warn("Texture load failed", err); setTexture(null); }
-    );
+    const lowRes = "/earth_texture1.jpg";
+    const highRes = "/earth_latlong_texture.png";
+
+    // Start high-res fetch immediately so the browser begins downloading it as early as possible
+    loader.load(highRes, (hiTex) => {
+      if (!mountedRef.current) return;
+      try {
+        hiTex.wrapS = THREE.RepeatWrapping;
+        hiTex.wrapT = THREE.ClampToEdgeWrapping;
+        hiTex.repeat.x = 1;
+        hiTex.offset.x = 0;
+        hiTex.anisotropy = Math.min(16, hiTex.anisotropy || 12);
+        hiTex.encoding = THREE.sRGBEncoding;
+        hiTex.generateMipmaps = true;
+        hiTex.needsUpdate = true;
+        setTexture(hiTex);
+      } catch (e) { /* ignore */ }
+    }, undefined, (err) => {
+      // high-res may fail or be slow; we'll still attempt low-res for quick paint
+    });
+
+    // Load low-res immediately as well to show a fast initial texture
+    loader.load(lowRes, (lowTex) => {
+      if (!mountedRef.current) return;
+      try {
+        lowTex.wrapS = THREE.RepeatWrapping;
+        lowTex.wrapT = THREE.ClampToEdgeWrapping;
+        lowTex.repeat.x = 1;
+        lowTex.offset.x = 0;
+        lowTex.anisotropy = 4;
+        lowTex.encoding = THREE.sRGBEncoding;
+        lowTex.generateMipmaps = false;
+        lowTex.needsUpdate = true;
+        // only set low-res if no high-res already set
+        setTexture((prev) => prev ?? lowTex);
+      } catch (e) { /* ignore */ }
+    }, undefined, (err) => {
+      console.warn("Low-res texture load failed", err);
+      // if low-res fails, rely on high-res loader above
+    });
     return () => { mountedRef.current = false; };
   }, []);
 
@@ -94,25 +118,53 @@ export default function Globe({
     }
   }, []);
 
-  const handleActivate = () => {
-    onGlobeActivate();
+  // Toggle fullscreen via the small button only
+  const toggleFullscreen = () => {
+    if (isActive) onGlobeDeactivate();
+    else onGlobeActivate();
   };
   useEffect(() => {
-  if (!isActive) {
-    onGlobeDeactivate();
-  }
-}, [isActive, onGlobeDeactivate]);
+    // keep parent in sync; when isActive becomes false, ensure deactivate callback side-effects run
+    if (!isActive) {
+      onGlobeDeactivate();
+    }
+  }, [isActive, onGlobeDeactivate]);
 
 
   return (
     <div
       className={`globe-area-60 ${isActive ? 'globe-fullscreen' : ''} ${containerClassName}`.trim()}
-      onClick={handleActivate}
       role="presentation"
     >
-  <Canvas className="globe-canvas" camera={{ position: [0, 0, 6], fov: 45 }}>
+      {/* fullscreen toggle icon (top-left) - click only this to toggle fullscreen */}
+      <button
+        className="globe-fullscreen-btn"
+        aria-label={isActive ? 'Exit fullscreen' : 'Enter fullscreen'}
+        onClick={(e) => { e.stopPropagation(); toggleFullscreen(); }}
+        title={isActive ? 'minimize' : 'fullscreen'}
+      >
+        {/* clean outline fullscreen icon (uses stroke for clarity) */}
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+          <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9V3h6" />
+            <path d="M21 9V3h-6" />
+            <path d="M3 15v6h6" />
+            <path d="M21 15v6h-6" />
+          </g>
+        </svg>
+      </button>
+  <Canvas
+    className="globe-canvas"
+    camera={{ position: [0, 0, 6], fov: 45 }}
+    gl={{ alpha: false }}
+    onCreated={({ gl }) => {
+      // set an opaque clear color that matches the globe surface/backdrop
+      gl.setClearColor(new THREE.Color(0x0b1b22));
+      gl.outputEncoding = THREE.sRGBEncoding;
+    }}
+  >
         <ambientLight intensity={1}/>
-        <directionalLight position={[5,5,5]} intensity={0.7}/>
+        <directionalLight position={[5,5,5]} intensity={1}/>
         <Stars radius={100} depth={50} count={1000} factor={4} fade />
 
         <group rotation={[0, -Math.PI / 2, 0]}>

@@ -193,6 +193,13 @@ a {
   margin: 0 auto;
   min-height: 40px;
 }
+
+/* responsive nav and touch-friendly targets */
+@media (max-width: 800px) {
+  .nav-inner { padding: 0 12px; }
+  .nav-links { gap: 10px; }
+  .nav-links a { padding: 8px 10px; font-size: 0.95rem; }
+}
 .nav-brand {
   display: flex;
   align-items: center;
@@ -323,6 +330,21 @@ a {
 .page-container { padding: 32px; }
 .container-medium { max-width: 900px; margin: 0 auto; }
 
+/* Performance: reduce heavy visuals on small devices */
+@media (max-width: 600px) {
+  body { font-size: 14px; }
+  .container-medium { padding: 24px 12px; }
+  .page-container { padding: 18px; }
+  .professional-section { padding: 28px 12px; }
+  /* reduce particle effect visibility on tiny screens */
+  .tsparticles-canvas-el { opacity: 0.9; }
+}
+
+/* Respect reduced motion preference globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
+
 /* Footer inner layout */
 .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
 .footer-left { color: var(--text-secondary); }
@@ -377,6 +399,26 @@ a {
   height: 60vh;
   margin-bottom: 28px;
 }
+/* Planned badge and modal small styles */
+.planned-badge { background: rgba(255,255,255,0.02); padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); color: var(--text-secondary); display: inline-flex; align-items: center; gap: 8px; }
+.planned-badge.pulse { animation: pulseBadge 900ms ease; box-shadow: 0 6px 24px rgba(59,130,246,0.12); }
+@keyframes pulseBadge { 0% { transform: scale(1); } 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.planned-modal .btn { margin-left: 8px; }
+/* Planned modal styling improvements */
+.planned-modal > div { box-shadow: 0 12px 40px rgba(2,8,20,0.6); border: 1px solid rgba(255,255,255,0.04); }
+.planned-modal ul { list-style: none; margin: 0; padding: 0; }
+.planned-item { display: flex; flex-direction: column; gap: 6px; padding: 12px; border-radius: 8px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005)); border: 1px solid rgba(255,255,255,0.02); }
+.planned-item + .planned-item { margin-top: 10px; }
+.planned-item .meta { color: var(--text-secondary); font-size: 0.9rem; }
+.planned-item .actions { display:flex; gap:8px; margin-top:6px; }
+.planned-item .actions .btn { padding:6px 10px; font-size:0.9rem; }
+.planned-modal .muted { color: var(--text-secondary); }
+.planned-item.moved { animation: movedHighlight 850ms ease; box-shadow: 0 8px 30px rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.18); }
+@keyframes movedHighlight {
+  0% { transform: translateY(-6px) scale(1.02); background: linear-gradient(180deg, rgba(59,130,246,0.06), rgba(255,255,255,0.006)); }
+  60% { transform: translateY(0px) scale(1); }
+  100% { transform: translateY(0px) scale(1); }
+}
 .view-panel {
   position: absolute;
   inset: 0;
@@ -421,6 +463,109 @@ a {
    pointer-events: auto;
   transform: scale(1);
 }
+
+/* Plan page styles */
+.plan-container { max-width: 1100px; margin: 0 auto; padding: 36px 20px; padding-left: 56px; }
+.plan-header { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom: 18px; }
+.plan-header-left { display:flex; align-items:center; gap:12px; }
+.plan-back {
+  position: fixed;
+  left: 12px;
+  top: 20px;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.25rem;
+  /* larger interactive area to make tapping/clicking easier */
+  width: 56px;
+  height: 56px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 10001;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.plan-back svg { display: block; pointer-events: none; width: 18px; height: 18px; }
+.plan-back:hover { background: rgba(255,255,255,0.02); color: var(--text-primary); transform: translateX(-2px); }
+.plan-container { padding-left: 56px; }
+.plan-title { margin: 0; font-size: 1.5rem; }
+.plan-subtitle { margin-top: 6px; font-size: 0.95rem; color: var(--text-secondary); }
+.plan-main { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+.plan-editor { padding: 0; }
+.plan-sidebar { padding: 0; }
+.plan-card { background: rgba(255,255,255,0.02); padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); box-shadow: 0 8px 28px rgba(2,8,20,0.45); }
+.plan-row { display:flex; align-items:center; gap:12px; margin-bottom: 12px; }
+.plan-row label { width: 110px; font-weight:600; color: var(--text-primary); }
+.plan-input { flex:1; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background: rgba(18,22,30,0.5); color: var(--text-primary); }
+.plan-input-narrow { width: 140px; }
+.plan-card .plan-input,
+.plan-card select.plan-input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' width='14' height='14'><path fill='%2394a3b8' d='M5 7l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+.plan-card .plan-input:focus,
+.plan-card select.plan-input:focus {
+  outline: none;
+  border-color: rgba(59,130,246,0.9);
+  box-shadow: 0 8px 28px rgba(59,130,246,0.09);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.002));
+}
+.plan-suggestions { margin-top:14px; }
+.plan-suggestions-header { display:flex; justify-content:space-between; align-items:center; }
+.suggestions-list { margin-top: 10px; display:flex; flex-direction:column; gap:8px; }
+.suggestion-item { padding:8px; border-radius:8px; background: linear-gradient(180deg, rgba(255,255,255,0.005), rgba(255,255,255,0.002)); border:1px solid rgba(255,255,255,0.02); }
+.ai-block { margin-top: 12px; }
+.ai-suggestion { padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); margin-top:8px; background: rgba(255,255,255,0.01); }
+.ai-badge { margin:0; color: var(--accent-primary); }
+.ai-actions { margin-top:8px; }
+.plan-actions { display:flex; gap:8px; align-items:center; margin-top: 14px; }
+.btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.04); padding: 8px 10px; border-radius:8px; cursor:pointer; }
+.plan-card .btn { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04); background: rgba(255,255,255,0.02); color: var(--text-primary); cursor: pointer; }
+.plan-card .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(2,8,20,0.35); }
+.plan-card .btn.btn-primary { background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); border: none; color: #fff; }
+.map-wrap { height: 220px; border-radius: 8px; overflow:hidden; }
+
+@media (max-width: 900px) {
+  .plan-main { grid-template-columns: 1fr; }
+  .plan-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .plan-back { position: absolute; left: 12px; top: 12px; }
+  .plan-container { padding-left: 18px; }
+}
+
+/* Debug helper: show back-button hit area when body.debug-click is set */
+body.debug-click .plan-back {
+  outline: 2px dashed rgba(96,165,250,0.18);
+  box-shadow: 0 6px 18px rgba(59,130,246,0.06);
+}
+
+/* Signature debug overlay used on Plan page when debugging signatures */
+.signature-debug {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 11000;
+  min-width: 260px;
+  max-width: 420px;
+  background: rgba(6,10,14,0.85);
+  color: var(--text-secondary);
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.signature-debug h4 { margin: 0 0 8px 0; color: var(--accent-primary); font-size: 13px; }
+.signature-debug pre { white-space: pre-wrap; word-break: break-word; color: var(--text-primary); background: transparent; margin: 4px 0; }
+.signature-debug .sig-list { max-height: 160px; overflow: auto; margin-top: 8px; border-top: 1px solid rgba(255,255,255,0.02); padding-top: 8px; }
 
 /* -------------------------------------- */
 /* Stats & Filters          */
@@ -531,11 +676,69 @@ a {
   border-radius: 18px;
   overflow: hidden;
   box-shadow: 0 12px 50px rgba(0, 80, 255, 0.10), 0 2px 8px rgba(0,0,0,0.10);
-  background: linear-gradient(135deg, #0d272d 0%, #1a2333 100%);
+  /* slightly lighter container gradient for a more open look */
+  background: linear-gradient(135deg, #12333a 0%, #22343a 100%);
   backdrop-filter: blur(8px) saturate(1.2);
   border: 1.5px solid rgba(0, 80, 255, 0.08);
   transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
 }
+.globe-area-60 .globe-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 50; /* sit above the global particle canvas */
+  /* softer radial vignette: strong at center but gentler falloff so the area feels lighter */
+  background: radial-gradient(circle at 50% 45%, rgba(8,14,20,0.94) 0%, rgba(8,16,22,0.86) 30%, rgba(8,18,24,0.7) 52%, rgba(8,20,26,0.45) 75%, rgba(8,20,26,0.0) 94%);
+  pointer-events: none;
+}
+
+.globe-area-60 .globe-canvas {
+  position: relative;
+  z-index: 60; /* ensure the three.js canvas renders above the backdrop */
+}
+
+/* Fullscreen toggle button shown inside the globe container (icon-only) */
+.globe-area-60 .globe-fullscreen-btn {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 90;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.globe-area-60 .globe-fullscreen-btn:hover {
+  background: rgba(26, 26, 26, 0.6);
+}
+.globe-area-60 .globe-fullscreen-btn svg { display: block; }
+
+/* simple tooltip on hover */
+.globe-area-60 .globe-fullscreen-btn::after {
+  content: attr(title);
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.globe-area-60 .globe-fullscreen-btn:hover::after { opacity: 1; transform: translateX(-50%) translateY(-4px); }
 .globe-area-60.globe-fullscreen {
   position: fixed;
   top: 0;
@@ -547,6 +750,7 @@ a {
   z-index: 999;
   margin: 0;
   border-radius: 0;
+  
 }
 /* Hide controls/sections when fullscreen */
 body:has(.globe-area-60.globe-fullscreen) .view-toggle,
@@ -554,6 +758,13 @@ body:has(.globe-area-60.globe-fullscreen) .top-section,
 body:has(.globe-area-60.globe-fullscreen) .cards-section {
   opacity: 0;
   pointer-events: none;
+}
+
+/* When the globe is fullscreen or visible, hide the global particle canvas underneath it */
+body:has(.globe-area-60.globe-fullscreen) .tsparticles-canvas-el,
+.globe-area-60 .tsparticles-canvas-el {
+  display: none !important;
+  visibility: hidden !important;
 }
 .view-toggle {
   display: inline-flex;
@@ -739,6 +950,49 @@ body:has(.globe-area-60.globe-fullscreen) .cards-section {
   gap: 12px;
   margin-top: 8px;
 }
+.page-tracked .cards-section .stat-card {
+  width: 100%;
+  max-width: 900px;
+  margin: 12px auto;
+  background: linear-gradient(180deg, rgba(18,24,36,0.6), rgba(10,14,20,0.5));
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+  transition: transform 0.18s cubic-bezier(.4,0,.2,1), box-shadow 0.18s;
+}
+.page-tracked .cards-section .stat-card:hover { transform: translateY(-6px); box-shadow: 0 14px 40px rgba(0,0,0,0.55); }
+.page-tracked .event-card { background: transparent; box-shadow: none; padding: 0; }
+.page-tracked .event-card .event-top { display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.page-tracked .event-card h3 { margin: 0; font-size: 1.25rem; }
+.tracked-badge { background: linear-gradient(90deg,var(--accent-secondary),var(--accent-primary)); color: #001; padding: 6px 10px; border-radius: 999px; font-weight:700; font-size:0.9rem; }
+.page-tracked .event-actions { justify-content: flex-start; gap: 10px; margin-top: 12px; }
+.page-tracked .btn { padding: 8px 12px; border-radius: 10px; }
+.page-tracked .btn-tracked { background: var(--success); color: #001; }
+.page-tracked .btn-plan { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.04); }
+
+/* Event card enhancements */
+.event-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 12px; border-radius: 12px; }
+.event-card .event-top { display:flex; justify-content:space-between; align-items:flex-start; gap: 12px; }
+.event-card h3 { margin:0; font-size:1.1rem; }
+.tracked-badge-inline { background: linear-gradient(90deg,var(--accent-secondary),var(--accent-primary)); color: #001; padding: 6px 10px; border-radius: 999px; font-weight:700; display:inline-flex; gap:8px; align-items:center; font-size:0.85rem; }
+.event-actions { display:flex; gap:12px; margin-top:12px; }
+.btn { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:0; cursor:pointer; background: rgba(255,255,255,0.02); color:var(--text-primary); }
+.btn-plan { background: linear-gradient(90deg, rgba(6,182,212,0.12), rgba(59,130,246,0.18)); color: #e6f7ff; font-weight:700; border: 1px solid rgba(6,182,212,0.18); padding:8px 12px; border-radius:10px; }
+.btn-tracked { background: var(--success); color:#001; }
+.btn-track { background: transparent; color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.04); padding:6px 10px; border-radius:8px; font-weight:600; }
+
+/* Plan page specific tweaks */
+.page-plan .find-badge { background: transparent; border: 1px solid rgba(255,255,255,0.04); color: var(--text-secondary); padding:6px 10px; border-radius:8px; }
+.page-plan input[type="number"], .page-plan select { background: rgba(255,255,255,0.02); color:var(--text-primary); border:1px solid rgba(255,255,255,0.04); padding:8px; border-radius:8px; }
+.page-plan h3 { margin-top:0; }
+
+/* AI suggestion badge and spinner */
+.ai-badge { display:inline-flex; gap:8px; align-items:center; background: linear-gradient(90deg,#8b5cf6,#06b6d4); color: #fff; padding:4px 8px; border-radius:999px; font-size:0.85rem; font-weight:700; }
+.ai-spinner { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,0.15); border-top-color: #fff; animation: spin 0.9s linear infinite; display:inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.ai-suggestion { background: rgba(255,255,255,0.02); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); margin-bottom:8px; }
 .event-card .debug-key {
   font-size: 11px;
   color: #9aa6b2;
@@ -1101,5 +1355,11 @@ body:has(.globe-area-60.globe-fullscreen) .cards-section {
 @media (max-width: 720px) {
   .footer > div { flex-direction: column; align-items: stretch; gap: 8px; }
   .professional-inner { grid-template-columns: 1fr; }
+}
+
+/* Keep particle canvas underneath the primary UI and make it subtle */
+.tsparticles-canvas-el {
+  z-index: 0 !important;
+  opacity: 0.85 !important;
 }
 

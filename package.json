@@ -6,13 +6,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "generate:texture": "node scripts/generateEarthTexture.js"
+    "generate:texture": "node scripts/generateEarthTexture.js",
+    "start:ai": "node server/ai-proxy.js"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "@supabase/supabase-js": "^2.58.0",
     "axios": "^1.12.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
     "leaflet": "^1.9.4",
     "motion": "^12.23.22",
     "react": "^18.2.0",

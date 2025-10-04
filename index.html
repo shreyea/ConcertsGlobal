@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Concerts Globe</title>
+    <!-- Hint browser to fetch the high-res globe texture as early as possible -->
+    <link rel="preload" href="/earth_latlong_texture.png" as="image">
+    <!-- Low-res texture prefetched for quick initial paint -->
+    
   </head>
   <body>
     <div id="root"></div>
