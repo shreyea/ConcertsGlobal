@@ -1,7 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
-
+/* Ensure Pangolin is available as a fallback; main import is in global.css */
 .variable-proximity {
-  font-family: 'Tuffy', sans-serif;
+  /* inherit parent font so headings can control the font-family (e.g., Pangolin for brand) */
+  font-family: inherit;
+  /* Inherit the brand gradient look used by .brand-title */
+  background: linear-gradient(90deg,#bfe9ff,#9ad3ff,#ffd6a5,#c7b8ff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-shadow: 0 6px 24px rgba(59,130,246,0.04);
+  animation: gradientShift 6s linear infinite;
 }
 
 .sr-only {

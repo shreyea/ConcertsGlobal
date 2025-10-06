@@ -17,6 +17,33 @@ export function AppProvider({ children }) {
     localStorage.setItem("likedEvents", JSON.stringify(liked));
   }, [liked]);
 
+  // Followed artists (persisted)
+  const [followingArtists, setFollowingArtists] = useState(() => {
+    try {
+      const raw = localStorage.getItem('followingArtists:v1');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    try { localStorage.setItem('followingArtists:v1', JSON.stringify(followingArtists)); } catch {}
+  }, [followingArtists]);
+
+  function toggleFollowArtist(artist) {
+    if (!artist || !artist.id) return;
+    setFollowingArtists(prev => {
+      const exists = prev.some(a => String(a.id) === String(artist.id));
+      if (exists) {
+        try { notify && notify(`Unfollowed ${artist.name || 'artist'}`); } catch {}
+        return prev.filter(a => String(a.id) !== String(artist.id));
+      }
+      try { notify && notify(`Following ${artist.name || 'artist'}`); } catch {}
+      return [artist, ...prev].slice(0, 200);
+    });
+  }
+
   // Planned events/plans persisted locally. Stored as array of plan objects.
   const [planned, setPlanned] = useState(() => {
     try {
@@ -235,6 +262,7 @@ const toggleTrack = (eventId) => {
     <AppContext.Provider value={{
       user, setUser,
       liked, tracked, trackedIds, toggleTrack, toggleLike,
+      followingArtists, toggleFollowArtist,
       getEventKey,
       toast, notify,
       planned, addPlanned, removePlanned, clearPlanned, getPlannedById, updatePlannedServerId,

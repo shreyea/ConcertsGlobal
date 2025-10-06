@@ -1,26 +1,20 @@
 import React, { useEffect, useMemo } from "react";
+import { createPortal } from 'react-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 const DEFAULT_CENTER = [20, 0];
 
-function MapEventBridge({
-  onSurfaceActivate
-}) {
+function MapEventBridge() {
+  // Intentionally left as a no-op for fullscreen activation.
+  // Fullscreen / surface expansion should only occur when the user
+  // explicitly clicks the fullscreen control.
   useMapEvents({
-    mousedown: (e) => {
-      if (!e.originalEvent.target.closest('.leaflet-marker-icon')) {
-        onSurfaceActivate();
-      }
-    },
-    touchstart: (e) => {
-      if (!e.originalEvent.target.closest('.leaflet-marker-icon')) {
-        onSurfaceActivate();
-      }
-    },
-    dragstart: () => onSurfaceActivate(),
-    zoomstart: () => onSurfaceActivate()
+    mousedown: () => {},
+    touchstart: () => {},
+    dragstart: () => {},
+    zoomstart: () => {}
   });
   return null;
 }
@@ -83,12 +77,33 @@ export default function MapView({
     []
   );
 
-  return (
+  const toggleFullscreen = (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (isActive) onSurfaceDeactivate();
+    else onSurfaceActivate();
+  };
+
+  const content = (
     <div
       className={`globe-area-60 map-view ${isActive ? "globe-fullscreen" : ""} ${containerClassName}`.trim()}
-      onClick={() => onSurfaceActivate()}
       role="presentation"
     >
+      {/* fullscreen toggle icon (top-left) - click only this to toggle fullscreen */}
+      <button
+        className="globe-fullscreen-btn"
+        aria-label={isActive ? 'Exit fullscreen' : 'Enter fullscreen'}
+        onClick={(e) => toggleFullscreen(e)}
+        title={isActive ? 'minimize' : 'fullscreen'}
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
+          <g fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9V3h6" />
+            <path d="M21 9V3h-6" />
+            <path d="M3 15v6h6" />
+            <path d="M21 15v6h-6" />
+          </g>
+        </svg>
+      </button>
       <MapContainer
         key={`${isVisible}-${isActive}`}
         center={DEFAULT_CENTER}
@@ -103,7 +118,6 @@ export default function MapView({
         <MapController positions={eventPositions} isVisible={isVisible} isActive={isActive} />
         <MapResizeWatcher />
         <MapEventBridge
-          onSurfaceActivate={onSurfaceActivate}
         />
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -116,7 +130,6 @@ export default function MapView({
             icon={markerIcon}
             eventHandlers={{
               click: () => {
-                onSurfaceActivate();
                 onMarkerClick(event);
               }
             }}
@@ -133,4 +146,14 @@ export default function MapView({
       </MapContainer>
     </div>
   );
+
+  if (isActive && typeof document !== 'undefined') {
+    try {
+      return createPortal(content, document.body);
+    } catch (e) {
+      return content;
+    }
+  }
+
+  return content;
 }

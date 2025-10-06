@@ -36,9 +36,7 @@ export default function Tracked() {
                     onOpen={(e) => setSelected(e)}
                     style={{ marginBottom: 12 }}
                   />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
-                    <span className="tracked-badge">Tracked</span>
-                  </div>
+                
                   {showKeys && <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>Key: {key}</div>}
                 </div>
               );

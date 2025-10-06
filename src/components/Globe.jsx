@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import { createPortal } from 'react-dom';
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars, Html } from "@react-three/drei";
 import * as THREE from "three";
@@ -118,20 +119,17 @@ export default function Globe({
     }
   }, []);
 
-  // Toggle fullscreen via the small button only
+  // Toggle fullscreen via the fullscreen button only
   const toggleFullscreen = () => {
-    if (isActive) onGlobeDeactivate();
-    else onGlobeActivate();
-  };
-  useEffect(() => {
-    // keep parent in sync; when isActive becomes false, ensure deactivate callback side-effects run
-    if (!isActive) {
+    if (isActive) {
       onGlobeDeactivate();
+    } else {
+      onGlobeActivate();
     }
-  }, [isActive, onGlobeDeactivate]);
+  };
 
 
-  return (
+  const content = (
     <div
       className={`globe-area-60 ${isActive ? 'globe-fullscreen' : ''} ${containerClassName}`.trim()}
       role="presentation"
@@ -153,27 +151,22 @@ export default function Globe({
           </g>
         </svg>
       </button>
-  <Canvas
-    className="globe-canvas"
-    camera={{ position: [0, 0, 6], fov: 45 }}
-    gl={{ alpha: false }}
-    onCreated={({ gl }) => {
-      // set an opaque clear color that matches the globe surface/backdrop
-      gl.setClearColor(new THREE.Color(0x0b1b22));
-      gl.outputEncoding = THREE.sRGBEncoding;
-    }}
-  >
+      <Canvas
+        className="globe-canvas"
+        camera={{ position: [0, 0, 6], fov: 45 }}
+        gl={{ alpha: false }}
+        onCreated={({ gl }) => {
+          // set an opaque clear color that matches the globe surface/backdrop
+          gl.setClearColor(new THREE.Color(0x0b1b22));
+          gl.outputEncoding = THREE.sRGBEncoding;
+        }}
+      >
         <ambientLight intensity={1}/>
         <directionalLight position={[5,5,5]} intensity={1}/>
         <Stars radius={100} depth={50} count={1000} factor={4} fade />
 
         <group rotation={[0, -Math.PI / 2, 0]}>
-          <mesh
-            onClick={() => {
-              handleActivate();
-              onMarkerClick(null);
-            }}
-          >
+          <mesh onClick={() => onMarkerClick(null)}>
             <sphereGeometry args={[2, 64, 64]} />
             <meshStandardMaterial 
               map={texture ?? null} 
@@ -191,10 +184,7 @@ export default function Globe({
                 key={ev.id}
                 pos={pos}
                 event={ev}
-                onClick={() => {
-                  handleActivate();
-                  onMarkerClick(ev);
-                }}
+                onClick={() => onMarkerClick(ev)}
               />
             );
           })}
@@ -212,4 +202,16 @@ export default function Globe({
       </Canvas>
     </div>
   );
+
+  // When fullscreen is active, render into document.body so the container is outside any transformed ancestors
+  if (isActive && typeof document !== 'undefined') {
+    try {
+      return createPortal(content, document.body);
+    } catch (e) {
+      // fallback to normal render if portal fails
+      return content;
+    }
+  }
+
+  return content;
 }

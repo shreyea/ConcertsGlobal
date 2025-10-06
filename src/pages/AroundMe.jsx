@@ -55,7 +55,7 @@ export default function AroundMe(){
         id: c._id || c.apiId,
         artist: Array.isArray(c.artists) ? c.artists.join(', ') : (c.artist || ''),
         name: c.name,
-        city: c.location || '',
+  city: c.city || c.location || '',
         country: '',
         continent: '',
         lat: c.lat,

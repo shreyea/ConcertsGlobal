@@ -1,3 +1,6 @@
+import ArtistProfile from "./pages/ArtistProfile";
+import Artists from "./pages/Artists";
+import Following from "./pages/Following";
 import React, { useContext } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/NavbarNew";
@@ -28,7 +31,9 @@ export default function App(){
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/artists" element={<Tracked/>} />
+  <Route path="/artists" element={<Artists />} />
+  <Route path="/following" element={<Following />} />
+  <Route path="/artist/:id" element={<ArtistProfile />} />
         <Route path="/around-me" element={<AroundMe />} />
         <Route path="/login" element={<Login />} />
         <Route path="/all-events" element={<AllEvents />} />

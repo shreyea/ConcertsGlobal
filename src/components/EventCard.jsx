@@ -30,7 +30,9 @@ export default function EventCard({ event, onOpen,style }) {
       <div className="event-top">
         <div>
           <h3>{event.name}</h3>
-          <div className="event-meta">{event.artist} • {event.city} • {event.date}</div>
+          {/* Show artist and date on one line, and city on the next line (use event.city from concerts.json) */}
+          <div className="event-meta">{event.artist || ''}{event.date ? ` • ${event.date}` : ''}</div>
+          <div className="event-location muted">{event.city || 'TBA'}</div>
           {typeof event.distanceKm === 'number' && (
             <div className="event-distance muted">{event.distanceKm.toFixed(1)} km away</div>
           )}
