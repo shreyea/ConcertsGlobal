@@ -15,17 +15,17 @@ export default function ArtistCard({ artist, onFollowToggle, isFollowing }) {
         <div className="artist-info">
           <div className="artist-name">{artist.name}</div>
           <div className="artist-genre muted">{artist.genre}</div>
-          <div className="artist-followers muted">Followed by {artist.followers.toLocaleString()} people</div>
+          <div className="artist-followers muted">Followed by {Number(artist.followers || 0).toLocaleString()} people</div>
         </div>
       </div>
 
-      <div className="artist-latest muted">Latest: {artist.latestShow?.venue || 'N/A'}, {artist.latestShow?.date || ''} • {artist.latestShow?.location || ''}</div>
+      <div className="artist-latest muted">Latest: {artist.latestShow?.venue || 'N/A'}{artist.latestShow?.date ? `, ${artist.latestShow?.date}` : ''}{artist.latestShow?.location ? ` • ${artist.latestShow.location}` : ''}</div>
 
       <div className="artist-actions">
-        <button className={`btn ${isFollowing ? 'btn-primary' : ''}`} onClick={() => onFollowToggle(artist.id)}>
+        <button className={`btn ${isFollowing ? 'btn-primary' : ''}`} onClick={(e) => { e.stopPropagation(); onFollowToggle && onFollowToggle(artist.id); }}>
           {isFollowing ? 'Following' : 'Follow'}
         </button>
-        <button className="btn btn-ghost" onClick={handleOpen}>View Profile</button>
+        <button className="btn btn-ghost" onClick={(e) => { e.stopPropagation(); handleOpen(); }}>View Profile</button>
       </div>
     </article>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState, useContext, useRef } from 'react';
 import BackgroundParticles from '../components/BackgroundParticles';
+import '../styles/artists.css';
 import TopPicksCarousel from '../components/TopPicksCarousel';
 import ArtistCard from '../components/ArtistCard';
 import { AppContext } from '../context/AppContext';
@@ -21,6 +22,7 @@ export default function Artists() {
   // Following dropdown on the page
   const [openFollowing, setOpenFollowing] = useState(false);
   const followingRef = useRef(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     // Use server-provided artists data (static file in this repo). In production this
@@ -120,85 +122,161 @@ export default function Artists() {
   return (
     <div className="page-root page-artists">
       <BackgroundParticles id="artists-bg" />
+      
 
-      {/* Top black control bar above the hero */}
-      <div className="artists-topbar">
-        <div className="container-medium artists-topbar-inner">
-          <div className="artists-controls-left">
-            <input placeholder="Search artists" value={query} onChange={(e) => setQuery(e.target.value)} className="plan-input" />
-            <select value={genre} onChange={e => setGenre(e.target.value)} className="plan-input">
-              <option value="">All genres</option>
-              {(artistsData.filters?.genres || []).map(g => (
-                <option key={g} value={g}>{g}</option>
-              ))}
-            </select>
-            <select value={country} onChange={e => setCountry(e.target.value)} className="plan-input">
-              <option value="">All countries</option>
-              {(artistsData.filters?.countries || []).map(c => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+      {/* Enhanced hero section with gradient overlay and dynamic content */}
+      <div className="artists-hero-full" style={{ position: 'relative' }}>
+        {(topPicks || []).length > 0 ? <TopPicksCarousel items={topPicks} autoPlay interval={4500} /> : null}
+        
+       {/* Overlayed hero controls: positioned in top right corner */}
+        <div className="artists-hero-controls">
+          <div className="hero-search-wrap">
+            <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <input  value={query} onChange={(e) => setQuery(e.target.value)} className="plan-input hero-search" />
           </div>
-
-          <div className="artists-controls-right">
-            <button className={`btn ${!showOnlyTopPicks ? 'btn-primary' : ''}`} onClick={() => { setShowOnlyTopPicks(false); setFilterMode('all'); }}>All</button>
-            <button className={`btn ${showOnlyTopPicks ? 'btn-primary' : ''}`} onClick={() => { setShowOnlyTopPicks(true); setFilterMode('top'); }}>Top Picks</button>
-            <button className={`btn ${filterMode === 'new' ? 'btn-primary' : ''}`} onClick={() => { setShowOnlyTopPicks(false); setFilterMode('new'); }}>New</button>
-
-            <div ref={followingRef} style={{ position: 'relative' }}>
-              <button className="btn btn-following" onClick={() => setOpenFollowing(s => !s)}>Following {(followingArtists || []).length ? `(${followingArtists.length})` : ''}</button>
-              {openFollowing && (
-                <div className="following-dropdown">
-                  {(!followingArtists || followingArtists.length === 0) ? (
-                    <div className="muted" style={{ padding: 12 }}>No followed artists yet</div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 8 }}>
-                      {(followingArtists || []).slice(0, 8).map(a => (
-                        <div key={a.id} className="following-item" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <img src={a.image || '/logo.png'} alt={a.name} style={{ width: 40, height: 40, borderRadius: 40, objectFit: 'cover' }} />
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 700 }}>{a.name}</div>
-                            <div className="muted" style={{ fontSize: 12 }}>{a.genre}</div>
-                          </div>
-                          <div>
-                            <button className="btn" onClick={() => handleFollowToggle(a.id)}>Unfollow</button>
-                          </div>
-                        </div>
-                      ))}
-                      <div style={{ textAlign: 'right', marginTop: 6 }}>
-                        <a href="/following" className="muted" onClick={() => setOpenFollowing(false)}>Manage all</a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+          <div className="hero-filter-wrap">
+            <button className="btn btn-ghost hero-filter-btn" onClick={() => setShowFilters(true)}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+              Filters
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Full-bleed hero carousel for featured artists */}
-      <div className="artists-hero-full">
-        {(topPicks || []).length > 0 ? <TopPicksCarousel items={topPicks} autoPlay interval={4500} /> : null}
+        {/* Gradient overlay for better text contrast */}
+        <div className="hero-gradient-overlay"></div>
+
+        
+      
+
+       
+
+        {/* Right-side Filters panel popup (overlaps content) */}
+        {showFilters && (
+          <div className="filters-panel-backdrop" onClick={() => setShowFilters(false)}>
+            <aside className="filters-panel-right" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <h3 style={{ margin: 0 }}>Filters</h3>
+                <button className="btn" onClick={() => setShowFilters(false)} aria-label="Close filters">✕</button>
+              </div>
+              <div style={{ display: 'grid', gap: 10 }}>
+                <label className="muted">Genre</label>
+                <select value={genre} onChange={e => setGenre(e.target.value)} className="plan-input">
+                  <option value="">All genres</option>
+                  {(artistsData.filters?.genres || []).map(g => (
+                    <option key={g} value={g}>{g}</option>
+                  ))}
+                </select>
+
+                <label className="muted">Country</label>
+                <select value={country} onChange={e => setCountry(e.target.value)} className="plan-input">
+                  <option value="">All countries</option>
+                  {(artistsData.filters?.countries || []).map(c => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <label className="muted">Mode</label>
+                  <select value={filterMode} onChange={e => setFilterMode(e.target.value)} className="plan-input">
+                    <option value="all">All</option>
+                    <option value="top">Top</option>
+                    <option value="new">New</option>
+                    <option value="trending">Trending</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <label className="muted">Sort</label>
+                  <select value={sortMode} onChange={e => setSortMode(e.target.value)} className="plan-input">
+                    <option value="most_followed">Most Followed</option>
+                    <option value="recent">Recently Added</option>
+                    <option value="performing_soon">Performing Soon</option>
+                  </select>
+                </div>
+
+                <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <input type="checkbox" checked={showOnlyTopPicks} onChange={e => setShowOnlyTopPicks(e.target.checked)} />
+                  <span className="muted">Show only Top Picks</span>
+                </label>
+
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 6 }}>
+                  <button className="btn" onClick={() => { setGenre(''); setCountry(''); setFilterMode('all'); setSortMode('most_followed'); setShowOnlyTopPicks(false); setShowFilters(false); }}>Clear</button>
+                  <button className="btn btn-primary" onClick={() => setShowFilters(false)}>Apply</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        )}
       </div>
 
       <div className="container-medium">
-        {/* small header/summary above controls */}
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ color: 'var(--text-secondary)', fontSize: 13 }}>Top picks detected: <strong style={{ color: 'var(--text-primary)' }}>{(topPicks || []).length}</strong></div>
+        {/* Stats bar with visual interest */}
+        <div className="artists-stats-bar">
+          <div className="stat-item">
+            <div className="stat-value">{artists.length}</div>
+            <div className="stat-label">Artists</div>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <div className="stat-value">{(topPicks || []).length}</div>
+            <div className="stat-label">Featured</div>
+          </div>
+          <div className="stat-divider"></div>
+          <div className="stat-item">
+            <div className="stat-value">{itemsToShow.length}</div>
+            <div className="stat-label">Showing</div>
+          </div>
         </div>
 
-        {/* View & Sort */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <label className="muted">View</label>
-            <button className={`btn ${viewMode === 'grid' ? 'btn-primary' : ''}`} onClick={() => setViewMode('grid')}>Grid</button>
-            <button className={`btn ${viewMode === 'list' ? 'btn-primary' : ''}`} onClick={() => setViewMode('list')}>List</button>
-            <button className={`btn ${viewMode === 'compact' ? 'btn-primary' : ''}`} onClick={() => setViewMode('compact')}>Compact</button>
+        {/* View & Sort controls with better spacing */}
+        <div className="artists-controls-bar">
+          <div className="view-mode-switcher">
+            <span className="control-label">View</span>
+            <div className="btn-group">
+              <button className={`btn btn-icon ${viewMode === 'grid' ? 'btn-primary' : ''}`} onClick={() => setViewMode('grid')} title="Grid view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </button>
+              <button className={`btn btn-icon ${viewMode === 'list' ? 'btn-primary' : ''}`} onClick={() => setViewMode('list')} title="List view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="8" y1="6" x2="21" y2="6"></line>
+                  <line x1="8" y1="12" x2="21" y2="12"></line>
+                  <line x1="8" y1="18" x2="21" y2="18"></line>
+                  <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                  <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                  <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+              </button>
+              <button className={`btn btn-icon ${viewMode === 'compact' ? 'btn-primary' : ''}`} onClick={() => setViewMode('compact')} title="Compact view">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </button>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <label className="muted">Sort</label>
-            <select value={sortMode} onChange={e => setSortMode(e.target.value)} className="plan-input">
+          <div className="sort-controls">
+            <span className="control-label">Sort by</span>
+            <select value={sortMode} onChange={e => setSortMode(e.target.value)} className="plan-input sort-select">
               <option value="most_followed">Most Followed</option>
               <option value="recent">Recently Added</option>
               <option value="performing_soon">Performing Soon</option>

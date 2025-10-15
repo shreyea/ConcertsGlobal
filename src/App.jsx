@@ -20,6 +20,7 @@ import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
 import About from "./pages/About";
 import ViewPlan from "./pages/ViewPlan";
+import Profile from "./pages/Profile";
 import { AppContext } from "./context/AppContext";
 
 
@@ -35,6 +36,7 @@ export default function App(){
   <Route path="/following" element={<Following />} />
   <Route path="/artist/:id" element={<ArtistProfile />} />
         <Route path="/around-me" element={<AroundMe />} />
+  <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/all-events" element={<AllEvents />} />
         <Route path="/live-events" element={<LiveEvents />} />

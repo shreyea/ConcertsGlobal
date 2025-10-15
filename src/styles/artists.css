@@ -1,0 +1,592 @@
+/* Artists page specific styles - glassmorphic grid, unique subtle look */
+.page-artists { --artists-gap: 18px; }
+.artists-hero-full { margin-bottom: 18px; }
+
+/* Container adjustments to avoid overlap with background particles */
+.page-artists .container-medium { position: relative; z-index: 4; }
+
+/* Tidy topbar: softer tint and reduced density on mobile */
+.artists-topbar { background: linear-gradient(90deg, rgba(3,7,18,0.88), rgba(6,10,18,0.96)); box-shadow: 0 6px 22px rgba(2,6,12,0.6); }
+
+/* Improved following dropdown */
+.following-dropdown { position: absolute; right: 0; top: 44px; width: 320px; background: rgba(6,10,18,0.9); border: 1px solid rgba(255,255,255,0.04); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); padding: 8px; z-index: 60; }
+
+/* Grid layout: subtle masonry-like flow with consistent card heights */
+.artists-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--artists-gap); align-items: start; }
+
+/* Artist card styling - glassy with smooth animations */
+.artist-card { 
+  background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+  padding: 14px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 160px;
+  position: relative;
+  overflow: hidden;
+  transition: all 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardFadeIn 0.5s ease-out both;
+}
+
+/* Stagger animation for cards */
+.artists-grid .artist-card:nth-child(1) { animation-delay: 0.5s; }
+.artists-grid .artist-card:nth-child(2) { animation-delay: 0.55s; }
+.artists-grid .artist-card:nth-child(3) { animation-delay: 0.6s; }
+.artists-grid .artist-card:nth-child(4) { animation-delay: 0.65s; }
+.artists-grid .artist-card:nth-child(5) { animation-delay: 0.7s; }
+.artists-grid .artist-card:nth-child(6) { animation-delay: 0.75s; }
+.artists-grid .artist-card:nth-child(n+7) { animation-delay: 0.8s; }
+
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.artist-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.08));
+  opacity: 0;
+  transition: opacity 280ms ease;
+  pointer-events: none;
+}
+
+.artist-card:hover::after {
+  opacity: 1;
+}
+
+.artist-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.12);
+}
+
+.artist-card .artist-top { 
+  display: flex; 
+  gap: 12px; 
+  align-items: center; 
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.artist-card .artist-avatar { 
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex: 0 0 76px;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  transition: transform 260ms ease;
+}
+
+.artist-card:hover .artist-avatar {
+  transform: scale(1.05);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+.artist-card .artist-info { min-width: 0; }
+
+.artist-card .artist-name { 
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.artist-card .artist-genre { 
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.artist-card .artist-followers { 
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.artist-card .artist-latest { 
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  max-height: 3.6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: relative;
+  z-index: 1;
+}
+
+.artist-card .artist-actions { 
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Compact view tweaks */
+.artist-compact { display:flex; align-items:center; gap:8px; padding:10px; background: transparent; border: none; box-shadow: none; }
+
+/* Responsive: stacked controls on narrow screens */
+@media (max-width: 800px) {
+  .artists-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .artist-card { padding: 10px; }
+  .artist-avatar { width:56px; height:56px; border-radius: 8px; }
+  .following-dropdown { width: 92%; left: 4%; right: 4%; top: 56px; }
+}
+
+/* Ensure lists don't overlap hero; add breathing space */
+.artists-hero-full + .container-medium { margin-top: 8px; }
+
+/* subtle accent stripe on the left of each card for a unique look */
+.artist-card::before { content: ''; position: absolute; left: 8px; top: 8px; bottom: 8px; width: 4px; border-radius: 4px; background: linear-gradient(180deg, #7c3aed, #06b6d4); opacity: 0.08; pointer-events: none; }
+
+/* Enhanced hero section */
+.artists-hero-full { 
+  position: relative; 
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 0 0 24px 24px;
+}
+
+/* Gradient overlay for better readability */
+.hero-gradient-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.65) 100%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Hero content (title & subtitle) */
+.hero-content-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 3;
+  pointer-events: none;
+  animation: heroFadeIn 0.8s ease-out;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.85) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.85);
+  margin: 0;
+  font-weight: 400;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+@keyframes heroFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Hero overlay controls - positioned in top right corner */
+.artists-hero-controls { 
+  position: absolute; 
+  top: 24px;
+  right: 24px; 
+  display: flex; 
+  justify-content: flex-end; 
+  align-items: center; 
+  gap: 12px; 
+  z-index: 60;
+  animation: slideDown 0.6s ease-out 0.2s both;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-search-wrap {
+  position: relative;
+  width: 320px;
+  max-width: 320px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.hero-search { 
+  width: 100%;
+  padding: 12px 16px 12px 42px;
+  border-radius: 999px; 
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 220ms ease;
+}
+
+.hero-search::placeholder {
+  color: rgba(255,255,255,0.45);
+}
+
+.hero-search:focus {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.24);
+  outline: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.hero-filter-wrap { 
+  display: flex; 
+  gap: 8px; 
+  align-items: center; 
+}
+
+.hero-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.92rem;
+  transition: all 200ms ease;
+}
+
+.hero-filter-btn:hover {
+  background: rgba(255,255,255,0.14);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
+}
+
+.hero-filter-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Right-side filters panel/backdrop (overlays content) */
+.filters-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(6,8,12,0.22); /* soft dim, lets content show through */
+  z-index: 100;
+}
+
+/* Light, glassy right-side panel overlapping page content */
+.filters-panel-right {
+  position: fixed;
+  top: 64px; /* leave navbar space */
+  right: 20px;
+  width: 240px;
+  max-width: 92vw;
+  padding: 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(38, 52, 73, 0.92), rgba(75, 115, 167, 0.86));
+  border: 1px solid rgba(15,20,25,0.08);
+  box-shadow: 0 18px 50px rgba(14,20,30,0.12);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  color: #ffffff;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+
+.filters-panel-right h3 { margin: 0 0 6px 0; color: #071226; font-size: 1.02rem; }
+.filters-panel-right .plan-input { width: 100%; background: rgba(222, 242, 249, 0.95); border: 1px solid rgba(12,14,16,0.04); color: #071226; padding: 8px 10px; border-radius: 8px; }
+.filters-panel-right .btn { background: transparent; border: 0; color: #071226; }
+
+/* Stats bar - visually interesting summary */
+.artists-stats-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  margin: 24px 0;
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.06));
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 32px;
+  background: linear-gradient(180deg, transparent, rgba(255,255,255,0.08), transparent);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Controls bar with better layout */
+.artists-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  animation: fadeInUp 0.5s ease-out 0.4s both;
+}
+
+.view-mode-switcher,
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.control-label {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.02);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.btn-icon svg {
+  stroke: currentColor;
+}
+
+.sort-select {
+  min-width: 180px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.sort-select:hover {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.sort-select:focus {
+  outline: 2px solid rgba(124,58,237,0.3);
+  outline-offset: 2px;
+}
+
+/* Minimal button styles scoped to the Artists page */
+.page-artists .btn,
+.page-artists .btn-primary {
+  background: transparent;
+  border: 0;
+  color: var(--text-primary);
+  padding: 8px 12px;
+  font-size: 0.92rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 180ms ease;
+}
+
+.page-artists .btn:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+}
+
+.page-artists .btn-primary {
+  background: rgba(124,58,237,0.12);
+  color: var(--text-primary);
+}
+
+.page-artists .btn-primary:hover {
+  background: rgba(124,58,237,0.18);
+  transform: translateY(-1px);
+}
+
+/* Make sure focus is visible for accessibility */
+.page-artists .btn:focus,
+.page-artists .btn-primary:focus {
+  outline: 2px solid rgba(124,58,237,0.3);
+  outline-offset: 2px;
+}
+
+/* Small-screen behavior - panel becomes full-screen drawer */
+@media (max-width: 800px) {
+  .artists-hero-full {
+    min-height: 420px;
+    border-radius: 0 0 16px 16px;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.98rem;
+  }
+
+  .artists-hero-controls { 
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-search-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-filter-wrap {
+    justify-content: center;
+  }
+
+  .filters-panel-right {
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 18px;
+  }
+
+  .artists-stats-bar {
+    gap: 16px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  .artists-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .view-mode-switcher,
+  .sort-controls {
+    justify-content: space-between;
+  }
+
+  .sort-select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .artist-card {
+    padding: 12px;
+    min-height: 140px;
+  }
+
+  .artist-card .artist-avatar {
+    width: 64px;
+    height: 64px;
+  }
+}
